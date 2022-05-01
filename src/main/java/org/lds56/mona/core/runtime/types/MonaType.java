@@ -7,8 +7,6 @@ import java.math.BigInteger;
 /**
  * Mona types
  *
- * Created by  flyer on 2020-08-28
- *
  */
 public enum MonaType implements Serializable {
 
