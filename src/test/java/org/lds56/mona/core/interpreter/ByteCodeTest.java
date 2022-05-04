@@ -7,6 +7,7 @@ import org.lds56.mona.core.runtime.types.MonaNull;
 import org.lds56.mona.core.runtime.types.MonaNumber;
 import org.lds56.mona.core.runtime.types.MonaObject;
 import org.lds56.mona.core.runtime.types.MonaString;
+import org.lds56.mona.core.util.TestUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -16,13 +17,6 @@ import java.util.stream.Stream;
 
 public class ByteCodeTest {
 
-    private static Map<String, Object> InputOf(Object... args) {
-        Map<String, Object> result = new HashMap<>();
-        for (int i=0; i<args.length/2; i++) {
-            result.put(args[2*i].toString(), args[2*i+1]);
-        }
-        return result;
-    }
 
     @Test
     public void testExpr() {
@@ -54,7 +48,7 @@ public class ByteCodeTest {
 
         VirtualMach vm = VirtualMachFactory.createVM();
         vm.load(code);
-        MonaObject res = vm.run(InputOf("b", true));
+        MonaObject res = vm.run(TestUtils.inputOf("b", true));
 
         System.out.println(res.getValue());
         Assertions.assertEquals(res.getValue(), 2);
@@ -109,7 +103,7 @@ public class ByteCodeTest {
 
         VirtualMach vm = VirtualMachFactory.createVM();
         vm.load(code);
-        MonaObject res = vm.run(InputOf("y", 10));
+        MonaObject res = vm.run(TestUtils.inputOf("y", 10));
 
         System.out.println(res.getValue());
         Assertions.assertEquals(res.getValue(), 11);
@@ -154,7 +148,7 @@ public class ByteCodeTest {
 
         VirtualMach vm = VirtualMachFactory.createVM();
         vm.load(code);
-        MonaObject res = vm.run(InputOf("y", 10));
+        MonaObject res = vm.run(TestUtils.inputOf("y", 10));
 
         System.out.println(res.getValue());
         Assertions.assertEquals(res.getValue(), 10);
@@ -217,7 +211,7 @@ public class ByteCodeTest {
         VirtualMach vm = VirtualMachFactory.createVM();
         vm.load(code);
         List<Integer> l =  Stream.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11).collect(Collectors.toList());
-        MonaObject res = vm.run(InputOf("l", MonaObject.wrap(l)));
+        MonaObject res = vm.run(TestUtils.inputOf("l", MonaObject.wrap(l)));
 
         System.out.println(res.getValue());
         Assertions.assertEquals(res.getValue(), 30);

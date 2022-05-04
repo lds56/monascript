@@ -9,20 +9,13 @@ import org.lds56.mona.core.codegen.InterpreterByteCodeGen;
 import org.lds56.mona.core.syntax.antlr.MonaLexer;
 import org.lds56.mona.core.syntax.antlr.MonaParser;
 import org.lds56.mona.core.syntax.ast.ASTParserVisitor;
+import org.lds56.mona.core.util.TestUtils;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 public class CodeGenTest {
-
-    private static Map<String, Object> InputOf(Object... args) {
-        Map<String, Object> result = new HashMap<>();
-        for (int i=0; i<args.length/2; i++) {
-            result.put(args[2*i].toString(), args[2*i+1]);
-        }
-        return result;
-    }
 
     Object interpret(String expr) {
         return interpret(expr, new HashMap<>());
@@ -108,7 +101,7 @@ public class CodeGenTest {
                       "} " +
                       "return ans;";
         // System.out.println(interpret(expr));
-        Object result = interpret(expr, InputOf("l", Arrays.asList(1,2,3,4,5)));
+        Object result = interpret(expr, TestUtils.inputOf("l", Arrays.asList(1, 2, 3, 4, 5)));
 
         Assertions.assertEquals(result, 15);
     }

@@ -210,6 +210,11 @@ public class ASTParserVisitor<T> extends MonaParserBaseVisitor<T> {
         return visit(ctx.expr());
     }
 
+    @Override
+    public T visitParenExpr(ParenExprContext ctx) {
+        return visit(ctx.value_expr());
+    }
+
 //    @Override
 //    public T visitLambda(LambdaContext ctx) {
 //        return codeGen.onLambda()
