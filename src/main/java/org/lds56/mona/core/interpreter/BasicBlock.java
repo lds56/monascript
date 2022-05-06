@@ -26,10 +26,6 @@ public class BasicBlock {
 
     private String[] localVarNames;
 
-    public BasicBlock(int startAddress, Instruction[] instructions, MonaObject[] constValues, String[] localVarNames) {
-        new BasicBlock(null, startAddress, instructions, constValues, localVarNames);
-    }
-
     public BasicBlock(String name, int startAddress, Instruction[] instructions, MonaObject[] constValues, String[] localVarNames) {
         this.name = name;
         this.startAddress = startAddress;
@@ -44,7 +40,7 @@ public class BasicBlock {
 
 
     public static BasicBlock build(int startAddress, Instruction[] instructions, MonaObject[] constValues, String[] localVarNames) {
-        return new BasicBlock(startAddress, instructions, constValues, localVarNames);
+        return new BasicBlock(null, startAddress, instructions, constValues, localVarNames);
     }
 
     public void setStartAddress(int startAddress) {
@@ -95,10 +91,14 @@ public class BasicBlock {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("CONST: ").append(Arrays.stream(constValues).map(o -> o.getValue().toString()).collect(Collectors.joining(","))).append("\n");
-        sb.append("LOCAL: ").append(Arrays.toString(localVarNames)).append("\n");
-        for (Instruction instr : instructions) {
-            sb.append(instr.toString()).append("\n");
+        if (constValues != null && constValues.length > 0)
+            sb.append("CONST: [").append(Arrays.stream(constValues).map(MonaObject::toString).collect(Collectors.joining(","))).append("]\n");
+        if (localVarNames != null && localVarNames.length > 0)
+            sb.append("LOCAL: ").append(Arrays.toString(localVarNames)).append("\n");
+        if (instructions != null && instructions.length > 0) {
+            for (Instruction instr : instructions) {
+                sb.append(instr.toString()).append("\n");
+            }
         }
         return sb.toString();
     }

@@ -15,6 +15,8 @@ public class Frame {
 
     private OperandStack<MonaObject> operandStack;
 
+    private Frame outerFrame;
+
     public Frame() {
         this.operandStack = new OperandStack<>();
     }
@@ -22,6 +24,7 @@ public class Frame {
     public Frame(MonaObject[] locals) {
         this.locals = locals;
         this.operandStack = new OperandStack<>();
+        this.outerFrame = null;
     }
 
     public static Frame createWithLocals(MonaObject[] locals) {
@@ -35,6 +38,15 @@ public class Frame {
         MonaObject[] locals = new MonaObject[localNum];
         System.arraycopy(args, 0, locals, 0, args.length);
         return new Frame(locals);
+    }
+
+    public Frame withOuter(Frame outerFrame) {
+        this.outerFrame = outerFrame;
+        return this;
+    }
+
+    public Frame getOuter() {
+        return outerFrame;
     }
 
     public MonaObject popOperand() {
@@ -60,12 +72,16 @@ public class Frame {
         return locals[idx];
     }
 
-    public void setLocal(MonaObject obj, int idx) {
+    public void setLocal(int idx, MonaObject obj) {
         locals[idx] = obj;
     }
 
     public MonaObject[] getLocals() {
         return locals;
+    }
+
+    public int getLocalNum() {
+        return locals.length;
     }
 
     public Object[] getOperands() {

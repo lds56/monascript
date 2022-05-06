@@ -1,5 +1,8 @@
 package org.lds56.mona.core.interpreter;
 
+import org.lds56.mona.core.runtime.types.MonaObject;
+import org.lds56.mona.core.runtime.types.MonaUndefined;
+
 /**
  * @author lds56
  * @date 2022/04/20
@@ -8,13 +11,13 @@ package org.lds56.mona.core.interpreter;
  */
 public class Context {
 
-    private final org.lds56.mona.core.interpreter.Frame _frame;
+    private final Frame _frame;
 
-    private final org.lds56.mona.core.interpreter.BasicBlock _block;
+    private final BasicBlock _block;
 
     public int _pc;        // program counter
 
-    public Context(int pc, org.lds56.mona.core.interpreter.Frame frame, org.lds56.mona.core.interpreter.BasicBlock block) {
+    public Context(int pc, Frame frame, BasicBlock block) {
         this._pc = pc;
         this._frame = frame;
         this._block = block;
@@ -22,11 +25,33 @@ public class Context {
 
     public int pc() { return _pc; }
 
-    public org.lds56.mona.core.interpreter.Frame frame() {
+    public Frame frame() {
         return _frame;
     }
 
-    public org.lds56.mona.core.interpreter.BasicBlock block() {
+    public BasicBlock block() {
         return _block;
+    }
+
+    public MonaObject findGlobal(int negIndex) {
+        Frame outer;;
+        while ((outer = _frame.getOuter()) != null) {
+            negIndex = outer.getLocalNum() + negIndex;
+            if (negIndex >= 0) {
+                return outer.getLocal(negIndex);
+            }
+        }
+        return MonaUndefined.UNDEF;
+    }
+
+    public void setGlobal(int negIndex, MonaObject value) {
+        Frame outer;;
+        while ((outer = _frame.getOuter()) != null) {
+            negIndex = outer.getLocalNum() + negIndex;
+            if (negIndex >= 0) {
+                outer.setLocal(negIndex, value);
+                return;
+            }
+        }
     }
 }

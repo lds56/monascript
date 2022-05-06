@@ -48,8 +48,11 @@ public class VirtualMach {
         blockStack.push(block);
     }
 
-    public void enterBlockAt(int index) {
-        blockStack.push(byteCode.getBlock(index));
+    public boolean enterBlockAt(int index) {
+        BasicBlock newBlock = byteCode.getBlock(index);
+        boolean isRecursion = !blockStack.isEmpty() && newBlock.equals(blockStack.peek());
+        blockStack.push(newBlock);
+        return isRecursion;
     }
 
     public void exitBlock() {
@@ -101,7 +104,8 @@ public class VirtualMach {
         String sb = ctx.block().name + " | " + (ctx.pc() - ctx.block().startAddress) + " | " +
                     ins.getOpCode().repr() + " " + (ins.getArg() == null? "" : ins.getArg()) + "\n" +
                     "local vars: [" + Arrays.stream(ctx.frame().getLocals()).map(Object::toString).collect(Collectors.joining(",")) + "]\n" +
-                    "operands: [" + Arrays.stream(ctx.frame().getOperands()).map(Object::toString).collect(Collectors.joining(",")) + "]\n";
+                    "operands: [" + Arrays.stream(ctx.frame().getOperands()).map(Object::toString).collect(Collectors.joining(",")) + "]\n" +
+                    "signal: " + signal.type().toString();
         System.out.println(sb);
     }
 
@@ -128,9 +132,10 @@ public class VirtualMach {
                 break;
             case CALL:
                 // enter to callee's basic block
-                enterBlockAt(signal.intValue());
+                boolean selfCall = enterBlockAt(signal.intValue());
                 // push a new frame for callee
-                pushFrame(Frame.createWithArgs(signal.argsValue(), nowBlock().getLocalNum()));
+                pushFrame(Frame.createWithArgs(signal.argsValue(), nowBlock().getLocalNum())
+                               .withOuter(selfCall ? topFrame().getOuter() : topFrame()));
                 // stash caller address & move to callee address
                 moveToCalleeStart();
                 break;

@@ -118,6 +118,12 @@ public class OpLogic {
         return Signal.emitNext();
     }
 
+    public static Signal LoadGlobal(Context context, Integer index) {
+        MonaObject value = context.findGlobal(-index);
+        context.frame().pushOperand(value);
+        return Signal.emitNext();
+    }
+
     public static Signal LoadConst(Context context, Integer index) {
         MonaObject value = context.block().loadConst(index);
         context.frame().pushOperand(value);
@@ -126,10 +132,15 @@ public class OpLogic {
 
     public static Signal StoreLocal(Context context, Integer index) {
         MonaObject value = context.frame().popOperand();
-        context.frame().setLocal(value, index);
+        context.frame().setLocal(index, value);
         return Signal.emitNext();
     }
 
+    public static Signal StoreGlobal(Context context, Integer index) {
+        MonaObject value = context.frame().popOperand();
+        context.setGlobal(-index, value);
+        return Signal.emitNext();
+    }
 
     public static Signal GetIterator(Context context, Integer unused) {
         MonaObject iter = context.frame().popOperand().iter();
@@ -215,11 +226,12 @@ public class OpLogic {
         for (int i=0; i<argNum; i++) {
             args[argNum - i - 1] = context.frame().popOperand();
         }
-        return Signal.emitCall(context.frame().popOperand().intValue(), args);
+        int funcbbi = context.frame().popOperand().intValue();
+        return Signal.emitCall(funcbbi, args);
     }
 
     public static Signal MakeFunction(Context context, Integer flag) {
-        context.frame().pushOperand(new MonaBB(flag));
+        context.frame().pushOperand(new MonaBB(flag));      // TODO: change MonaBB
         return Signal.emitNext();
     }
 

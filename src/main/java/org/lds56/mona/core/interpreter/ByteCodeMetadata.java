@@ -1,6 +1,7 @@
 package org.lds56.mona.core.interpreter;
 
 
+import org.lds56.mona.core.runtime.types.MonaNull;
 import org.lds56.mona.core.runtime.types.MonaObject;
 
 import java.util.ArrayList;
@@ -22,10 +23,10 @@ public class ByteCodeMetadata {
     private final List<String> localVarNames;
 
     private int loopNo = 0;
-    private Stack<Integer> loopNoStack = new Stack<>();
+    private final Stack<Integer> loopNoStack = new Stack<>();
 
     private int condNo = 0;
-    private Stack<Integer> condNoStack = new Stack<>();
+    private final Stack<Integer> condNoStack = new Stack<>();
 
     // private final Stack<> loopBlocks;
 
@@ -33,6 +34,7 @@ public class ByteCodeMetadata {
         this.blockName = blockName;
         this.constValues = new ArrayList<>();
         this.localVarNames = new ArrayList<>();
+        this.constValues.add(MonaNull.NIL);
         // this.loopBlocks = new Stack<>();
     }
 

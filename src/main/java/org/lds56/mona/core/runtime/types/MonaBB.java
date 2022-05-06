@@ -1,6 +1,6 @@
 package org.lds56.mona.core.runtime.types;
 
-
+// TODO: change it
 public class MonaBB extends MonaObject {
 
     private int bbIndex;

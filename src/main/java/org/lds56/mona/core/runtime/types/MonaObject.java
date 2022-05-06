@@ -2,7 +2,6 @@ package org.lds56.mona.core.runtime.types;
 
 // import org.lds56.mona.core.compiler.method.MethodFactory;
 import org.lds56.mona.core.exception.ContextAccessException;
-import org.lds56.mona.core.exception.FunctionNotFoundException;
 import org.lds56.mona.core.exception.InvokeErrorException;
 import org.lds56.mona.core.exception.TypeBadCastException;
 // import org.apache.commons.beanutils.PropertyUtils;
