@@ -9,7 +9,6 @@ import org.lds56.mona.core.runtime.types.MonaObject;
 import org.lds56.mona.core.runtime.types.MonaString;
 import org.lds56.mona.core.util.TestUtils;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -109,6 +108,71 @@ public class ByteCodeTest {
         Assertions.assertEquals(res.getValue(), 11);
     }
 
+    @Test
+    public void testFuncCall2() {
+
+//        let counter = 1;
+//        let adder = x -> {
+//            counter += 1;
+//            return x + counter;
+//        }
+//        return adder(1) + adder(1);
+        Instruction[] ins_main = new Instruction[] {
+                // Instruction.of(OpCode.LOAD_CONSTANT, 2),    // bb index
+                // Instruction.of(OpCode.LOAD_CONSTANT, 3),
+                Instruction.of(OpCode.LOAD_CONSTANT,    1),
+                Instruction.of(OpCode.STORE_LOCAL,      0),
+                Instruction.of(OpCode.MAKE_FUNCTION,    1),
+                Instruction.of(OpCode.STORE_LOCAL,      1),
+                Instruction.of(OpCode.LOAD_LOCAL,       1),
+                Instruction.of(OpCode.LOAD_CONSTANT,    1),
+                Instruction.of(OpCode.CALL_FUNCTION,    1),
+                Instruction.of(OpCode.LOAD_LOCAL,       1),
+                Instruction.of(OpCode.LOAD_CONSTANT,    1),
+                Instruction.of(OpCode.CALL_FUNCTION,    1),
+                Instruction.of(OpCode.BINARY_ADD),
+                Instruction.of(OpCode.RETURN_VALUE)
+                // [Nil, 1, 'f', 2]
+        };
+
+        MonaObject[] consts_main = new MonaObject[] {
+                MonaNull.NIL,
+                MonaNumber.valueOf(1),
+        };
+
+        String[] localNames_main = new String[] {"counter", "adder"};
+
+        Instruction[] ins_f = new Instruction[] {
+                Instruction.of(OpCode.LOAD_GLOBAL,      2),
+                Instruction.of(OpCode.LOAD_CONSTANT,    1),
+                Instruction.of(OpCode.INPLACE_ADD),
+                Instruction.of(OpCode.STORE_GLOBAL,     2),
+                Instruction.of(OpCode.LOAD_LOCAL,       0),
+                Instruction.of(OpCode.LOAD_GLOBAL,      2),
+                Instruction.of(OpCode.BINARY_ADD),
+                Instruction.of(OpCode.RETURN_VALUE)
+        };
+
+        // [Nil, 1, 'f', 2]
+        MonaObject[] consts_f = new MonaObject[] {
+                MonaNull.NIL,
+                MonaNumber.newInteger(1)
+        };
+
+        String[] localNames_f = new String[] {"x"};
+
+        ByteCode code = ByteCode.load(new BasicBlock[]{
+                BasicBlock.build(0, ins_main, consts_main, localNames_main).withName("__main__"),
+                BasicBlock.build(ins_main.length, ins_f, consts_f, localNames_f).withName("__f1__")
+        });
+
+        VirtualMach vm = VirtualMachFactory.createVM();
+        vm.load(code);
+        MonaObject res = vm.run(TestUtils.inputOf());
+
+        System.out.println(res.getValue());
+        Assertions.assertEquals(res.getValue(), 7);
+    }
 
     @Test
     public void testWhile() {

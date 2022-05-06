@@ -122,36 +122,62 @@ let adder = x -> {
 return adder(1) + adder(1);
 ```
 ```
-__f1__: bbi=0, bbf=0
-CONST_VAL:  [Nil, 1]
-LOCAL_VAR:  [x]
-GLOBAL_VAR: [adder]
-0 | LOADG   0 (adder)
-1 | LOADC   1 (1)
-2 | IADD
-3 | STOREG  0 (adder)
-4 | LOADL   0 (1)
-5 | LOADG   1 (adder)
-6 | ADD
-7 | RETVAL
 __main__: bbi=1, bbf=null
 CONST_VAL:  [Nil, 1]
 LOCAL_VAR:  [counter, adder]
 0 | LOADC   1
 1 | STOREL  0
-2 | MAKEF   1
-3 | STOREL  2
+2 | MAKEF   0
+3 | STOREL  1 
 4 | LOADC   1 (1)
 5 | LOADL   1 (adder)
 6 | CALLF   1
-7 | LOADC   1 (1)
-8 | LOADL   1 (adder)
+7 | LOADL   1 (adder)
+8 | LOADC   1 (1)
 9 | CALLF   1
 10| ADD
 11| RETVAL
+__f1__: bbi=0, bbf=0
+CONST_VAL:  [Nil, 1]
+LOCAL_VAR:  [x]
+GLOBAL_VAR: [adder]
+GLOBAL_POS: [1]
+0 | LOADG   -2 (counter)
+1 | LOADC   1 (1)
+2 | IADD
+3 | STOREG  -2 (counter)
+4 | LOADL   0 (1)
+5 | LOADG   -2 (counter)
+6 | ADD
+7 | RETVAL
 ```
+## Recursion
+```
+fn fib(n) {
+    if n == 1 || n == 2 {
+        return 1; 
+    }
+    return fib(n-1) + fib(n-2);
+}
+return fib(n);
+```
+## Closure
+```
+fn addgen(x) {
+    let adder = (y) -> {
+        return x+y;
+    }
+    return adder;
+}
+let adder1 = addgen(1);
+let adder2 = addgen(2);
+return adder1(1) + adder2(2)
+```
+```
+__main__: bbi=0
+CONST_VAL   :   [nil]
 
-
+```
 
 
 

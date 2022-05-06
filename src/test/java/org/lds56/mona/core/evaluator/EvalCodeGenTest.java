@@ -6,8 +6,6 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.lds56.mona.core.codegen.ExpressionEvalCodeGen;
-import org.lds56.mona.core.codegen.InterpreterByteCodeGen;
-import org.lds56.mona.core.interpreter.*;
 import org.lds56.mona.core.runtime.types.MonaObject;
 import org.lds56.mona.core.syntax.antlr.MonaLexer;
 import org.lds56.mona.core.syntax.antlr.MonaParser;
@@ -46,14 +44,12 @@ public class EvalCodeGenTest {
     public void testAdd() {
 
         String s = "1+2+3+4";
-
         Assertions.assertEquals(10, evaluate(s, TestUtils.inputOf()));
 
-
         String s2 = "1+2+3+4-(a+b)";
-
         Assertions.assertEquals(0, evaluate(s2, TestUtils.inputOf("a", 5, "b", 5)));
     }
+
 
 
 }
