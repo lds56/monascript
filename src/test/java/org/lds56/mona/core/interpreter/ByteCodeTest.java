@@ -16,7 +16,6 @@ import java.util.stream.Stream;
 
 public class ByteCodeTest {
 
-
     @Test
     public void testExpr() {
 
@@ -42,7 +41,7 @@ public class ByteCodeTest {
         String[] localNames = new String[] {"b"};
         
         ByteCode code = ByteCode.load(new BasicBlock[]{
-                BasicBlock.build(0, ins, consts, localNames).withName("__main__")
+                BasicBlock.build(ins).info("__main__", 0).vars(consts, localNames)
         });
 
         VirtualMach vm = VirtualMachFactory.createVM();
@@ -96,8 +95,8 @@ public class ByteCodeTest {
         String[] localNames_f = new String[] {"x"};
 
         ByteCode code = ByteCode.load(new BasicBlock[]{
-                BasicBlock.build(0, ins_main, consts_main, localNames_main).withName("__f__"),
-                BasicBlock.build(ins_main.length, ins_f, consts_f, localNames_f).withName("__main__")
+                BasicBlock.build(ins_main).info("__f__", 0).vars(consts_main, localNames_main),
+                BasicBlock.build(ins_f).info("__main__", ins_main.length).vars(consts_f, localNames_f),
         });
 
         VirtualMach vm = VirtualMachFactory.createVM();
@@ -143,12 +142,12 @@ public class ByteCodeTest {
         String[] localNames_main = new String[] {"counter", "adder"};
 
         Instruction[] ins_f = new Instruction[] {
-                Instruction.of(OpCode.LOAD_GLOBAL,      2),
+                Instruction.of(OpCode.LOAD_GLOBAL,      0),
                 Instruction.of(OpCode.LOAD_CONSTANT,    1),
                 Instruction.of(OpCode.INPLACE_ADD),
-                Instruction.of(OpCode.STORE_GLOBAL,     2),
+                Instruction.of(OpCode.STORE_GLOBAL,     0),
                 Instruction.of(OpCode.LOAD_LOCAL,       0),
-                Instruction.of(OpCode.LOAD_GLOBAL,      2),
+                Instruction.of(OpCode.LOAD_GLOBAL,      0),
                 Instruction.of(OpCode.BINARY_ADD),
                 Instruction.of(OpCode.RETURN_VALUE)
         };
@@ -161,9 +160,13 @@ public class ByteCodeTest {
 
         String[] localNames_f = new String[] {"x"};
 
+        String[] globalNames_f = new String[] {"counter"};
+
+        Integer[] globalPos_f = new Integer[] {0};
+
         ByteCode code = ByteCode.load(new BasicBlock[]{
-                BasicBlock.build(0, ins_main, consts_main, localNames_main).withName("__main__"),
-                BasicBlock.build(ins_main.length, ins_f, consts_f, localNames_f).withName("__f1__")
+                BasicBlock.build(ins_main).info("__main__", 0).vars(consts_main, localNames_main),
+                BasicBlock.build(ins_f).info("__f1__", ins_main.length).vars(consts_f, localNames_f, globalNames_f, globalPos_f),
         });
 
         VirtualMach vm = VirtualMachFactory.createVM();
@@ -207,7 +210,7 @@ public class ByteCodeTest {
         String[] localNames = new String[] {"x", "y"};
 
         ByteCode code = ByteCode.load(new BasicBlock[]{
-                BasicBlock.build(0, ins, consts, localNames).withName("__main__")
+                BasicBlock.build(ins).info("__main__", 0).vars(consts, localNames)
         });
 
         VirtualMach vm = VirtualMachFactory.createVM();
@@ -269,7 +272,7 @@ public class ByteCodeTest {
         String[] localNames = new String[] {"l", "ans", "x"};
 
         ByteCode code = ByteCode.load(new BasicBlock[]{
-                BasicBlock.build(0, ins, consts, localNames).withName("__main__")
+                BasicBlock.build(ins).info("__main__", 0).vars(consts, localNames)
         });
 
         VirtualMach vm = VirtualMachFactory.createVM();
@@ -279,5 +282,97 @@ public class ByteCodeTest {
 
         System.out.println(res.getValue());
         Assertions.assertEquals(res.getValue(), 30);
+    }
+
+
+
+    @Test
+    public void testClosure() {
+
+//        fn addgen(x) {
+//            fn adder(y) {
+//                return x+y;
+//            }
+//                return adder;
+//        }
+//        let adder1 = addgen(1);
+//        let adder2 = addgen(2);
+//        return adder1(1) + adder2(2)
+
+        ////////////////// main //////////////////
+        Instruction[] main_instr = new Instruction[] {
+                Instruction.of(OpCode.MAKE_FUNCTION,    1),
+                Instruction.of(OpCode.STORE_LOCAL,      0),
+                Instruction.of(OpCode.LOAD_LOCAL,       0),
+                Instruction.of(OpCode.LOAD_CONSTANT,    1),
+                Instruction.of(OpCode.CALL_FUNCTION,    1),
+                Instruction.of(OpCode.STORE_LOCAL,      1),
+                Instruction.of(OpCode.LOAD_LOCAL,       0),
+                Instruction.of(OpCode.LOAD_CONSTANT,    2),
+                Instruction.of(OpCode.CALL_FUNCTION,    1),
+                Instruction.of(OpCode.STORE_LOCAL,      2),
+                Instruction.of(OpCode.LOAD_LOCAL,       1),
+                Instruction.of(OpCode.LOAD_CONSTANT,    1),
+                Instruction.of(OpCode.CALL_FUNCTION,    1),
+                Instruction.of(OpCode.LOAD_LOCAL,       2),
+                Instruction.of(OpCode.LOAD_CONSTANT,    2),
+                Instruction.of(OpCode.CALL_FUNCTION,    1),
+                Instruction.of(OpCode.BINARY_ADD),
+                Instruction.of(OpCode.RETURN_VALUE),
+        };
+
+        MonaObject[] main_consts = new MonaObject[] {
+                MonaNull.NIL,
+                MonaNumber.newInteger(1),
+                MonaNumber.newInteger(2),
+        };
+
+        String[] main_localvars = new String[] {"addgen", "adder1", "adder2"};
+
+        ////////////////// addgen ////////////////////
+        Instruction[] addgen_instr = new Instruction[] {
+                Instruction.of(OpCode.MAKE_FUNCTION,2),
+                Instruction.of(OpCode.STORE_LOCAL,  1),
+                Instruction.of(OpCode.LOAD_LOCAL,   1),
+                Instruction.of(OpCode.RETURN_VALUE),
+        };
+
+        MonaObject[] addgen_consts = new MonaObject[] {
+                MonaNull.NIL,
+        };
+
+        String[] addgen_localvars = new String[] {"x", "adder"};
+
+        ////////////////// adder ////////////////////
+        Instruction[] adder_instr = new Instruction[] {
+                Instruction.of(OpCode.LOAD_GLOBAL,  0),
+                Instruction.of(OpCode.LOAD_LOCAL,   0),
+                Instruction.of(OpCode.BINARY_ADD),
+                Instruction.of(OpCode.RETURN_VALUE),
+        };
+
+        MonaObject[] adder_consts = new MonaObject[] {
+                MonaNull.NIL,
+        };
+
+        String[] adder_lcoalvars = new String[] {"y"};
+
+        String[] adder_globalvars = new String[] {"x"};
+
+        Integer[] adder_globalpos = new Integer[] {0};
+
+        ByteCode code = ByteCode.load(new BasicBlock[]{
+                BasicBlock.build(main_instr).info("__main__", 0).vars(main_consts, main_localvars),
+                BasicBlock.build(addgen_instr).info("__addgen__", main_instr.length).vars(addgen_consts, addgen_localvars),
+                BasicBlock.build(adder_instr).info("__addgen_adder__", main_instr.length + adder_instr.length)
+                                             .vars(adder_consts, adder_lcoalvars, adder_globalvars, adder_globalpos),
+        });
+
+        VirtualMach vm = VirtualMachFactory.createVM();
+        vm.load(code);
+        MonaObject res = vm.run(TestUtils.inputOf());
+
+        System.out.println(res.getValue());
+        Assertions.assertEquals(res.getValue(), 6);
     }
 }

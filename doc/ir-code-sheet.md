@@ -140,14 +140,14 @@ LOCAL_VAR:  [counter, adder]
 __f1__: bbi=0, bbf=0
 CONST_VAL:  [Nil, 1]
 LOCAL_VAR:  [x]
-GLOBAL_VAR: [adder]
+GLOBAL_VAR: [counter]
 GLOBAL_POS: [1]
-0 | LOADG   -2 (counter)
+0 | LOADG   0 (counter)
 1 | LOADC   1 (1)
 2 | IADD
-3 | STOREG  -2 (counter)
+3 | STOREG  0 (counter)
 4 | LOADL   0 (1)
-5 | LOADG   -2 (counter)
+5 | LOADG   0 (counter)
 6 | ADD
 7 | RETVAL
 ```
@@ -164,7 +164,7 @@ return fib(n);
 ## Closure
 ```
 fn addgen(x) {
-    let adder = (y) -> {
+    fn adder(y) {
         return x+y;
     }
     return adder;
@@ -175,8 +175,40 @@ return adder1(1) + adder2(2)
 ```
 ```
 __main__: bbi=0
+CONST_VAL   :   [nil, 1, 2]
+LOCAL_VAR   :   [addgen, adder1, adder2]
+0 | MAKEF   1
+1 | STOREL  0 (addgen)
+2 | LOADL   0 (addgen)
+3 | LOADC   1 (1)
+4 | CALLF   1
+5 | STOREL  1 (adder1)
+6 | LOADL   0 (addgen)
+7 | LOADC   2 (2)
+8 | CALLF   1
+9 | STOREL  2 (adder2)
+10| LOADL   1 (adder1)
+11| LOADC   1 (1)
+12| CALLF   1
+13| LOADL   2 (adder2)
+14| LOADC   2 (2)
+15| CALLF
+16| ADD
+17| RETVAL
+__addgen__: bbi=1
 CONST_VAL   :   [nil]
-
+LOCAL_VAR   :   [x, adder]
+0 | MAKEF   2
+1 | STOREL  1 (adder)
+2 | LOADL   1 (adder)
+3 | RETVAL
+__addgen_adder__: bbi=2
+CONST_VAL   :   [nil]
+LOCAL_VAR   :   [y]
+0 | LOADG   0 (x)
+1 | LOADL   0 (y)
+2 | ADD
+3 | RETVAL
 ```
 
 
