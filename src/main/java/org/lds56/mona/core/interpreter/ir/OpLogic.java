@@ -2,7 +2,7 @@ package org.lds56.mona.core.interpreter.ir;
 
 import org.lds56.mona.core.interpreter.Context;
 import org.lds56.mona.core.runtime.MonaCalculator;
-import org.lds56.mona.core.runtime.types.MonaBB;
+import org.lds56.mona.core.interpreter.MonaBB;
 import org.lds56.mona.core.runtime.types.MonaBoolean;
 import org.lds56.mona.core.runtime.types.MonaIter;
 import org.lds56.mona.core.runtime.types.MonaObject;
@@ -119,7 +119,7 @@ public class OpLogic {
     }
 
     public static Signal LoadGlobal(Context context, Integer index) {
-        MonaObject value = context.findGlobal(-index);
+        MonaObject value = context.findGlobal(index);
         context.frame().pushOperand(value);
         return Signal.emitNext();
     }
@@ -163,7 +163,7 @@ public class OpLogic {
     }
 
     public static Signal JumpLocal(Context context, Integer index) {
-        return Signal.emitJump(context.block().startAddress + index);
+        return Signal.emitJump(context.block().startAddress() + index);
     }
 
     public static Signal JumpGlobal(Context context, Integer index) {
@@ -176,7 +176,7 @@ public class OpLogic {
 
     public static Signal BranchTrue(Context context, Integer index) {
         if (context.frame().popOperand().booleanValue()) {
-            return Signal.emitJump(context.block().startAddress + index);
+            return Signal.emitJump(context.block().startAddress() + index);
         } else {
             return Signal.emitNext();
         }
@@ -184,7 +184,7 @@ public class OpLogic {
 
     public static Signal BranchFalse(Context context, Integer index) {
         if (!context.frame().popOperand().booleanValue()) {
-            return Signal.emitJump(context.block().startAddress + index);
+            return Signal.emitJump(context.block().startAddress() + index);
         } else {
             return Signal.emitNext();
         }
@@ -226,8 +226,8 @@ public class OpLogic {
         for (int i=0; i<argNum; i++) {
             args[argNum - i - 1] = context.frame().popOperand();
         }
-        int funcbbi = context.frame().popOperand().intValue();
-        return Signal.emitCall(funcbbi, args);
+        MonaObject funcbb = context.frame().popOperand();
+        return Signal.emitCall(funcbb, args);
     }
 
     public static Signal MakeFunction(Context context, Integer flag) {
@@ -253,7 +253,7 @@ public class OpLogic {
         MonaObject rhs = context.frame().popOperand();
         MonaObject lhs = context.frame().popOperand();
         if (binaryOp.apply(lhs, rhs).booleanValue()) {
-            return Signal.emitJump(context.block().startAddress + index);
+            return Signal.emitJump(context.block().startAddress() + index);
         } else {
             return Signal.emitNext();
         }

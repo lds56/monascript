@@ -1,5 +1,6 @@
 package org.lds56.mona.core.interpreter.ir;
 
+import org.lds56.mona.core.interpreter.MonaBB;
 import org.lds56.mona.core.runtime.types.MonaObject;
 
 /**
@@ -19,12 +20,14 @@ public class Signal {
 
     private final Type _type;
     private final Integer _intValue;
-    private final MonaObject[] _objValue;
+    private final MonaObject _objValue;
+    private final MonaObject[] _argsValue;
 
-    Signal(Type type, Integer intValue, MonaObject[] args) {
+    Signal(Type type, Integer intValue, MonaObject obj, MonaObject[] args) {
         this._type = type;
         this._intValue = intValue;
-        this._objValue = args;
+        this._objValue = obj;
+        this._argsValue = args;
     }
 
     public Type type() {
@@ -36,27 +39,31 @@ public class Signal {
     }
 
     public MonaObject objValue() {
-        return _objValue[0];
-    }
-
-    public MonaObject[] argsValue() {
         return _objValue;
     }
 
+    public MonaBB bbValue() {
+        return (MonaBB) _objValue;
+    }
+
+    public MonaObject[] argsValue() {
+        return _argsValue;
+    }
+
     public static Signal emitNext() {
-        return new Signal(Type.NEXT, null, null);
+        return new Signal(Type.NEXT, null, null, null);
     }
 
     public static Signal emitJump(int jumpLine) {
-        return new Signal(Type.JUMP, jumpLine, null);
+        return new Signal(Type.JUMP, jumpLine, null, null);
     }
 
-    public static Signal emitCall(int jumpBlock, MonaObject[] args) {
-        return new Signal(Type.CALL, jumpBlock, args);
+    public static Signal emitCall(MonaObject bb, MonaObject[] args) {
+        return new Signal(Type.CALL, null, bb, args);
     }
 
     public static Signal emitRet(MonaObject obj) {
-        return new Signal(Type.RET, null, new MonaObject[]{ obj});
+        return new Signal(Type.RET, null, obj, null);
     }
 
 }

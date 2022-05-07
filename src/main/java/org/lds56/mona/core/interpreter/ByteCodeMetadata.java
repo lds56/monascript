@@ -105,4 +105,12 @@ public class ByteCodeMetadata {
         String[] varNameArray = new String[localVarNames.size()];
         return localVarNames.toArray(varNameArray);
     }
+
+    public String[] toGlobalNameArray() {
+        return null;
+    }
+
+    public Integer[] toGlobalPosArray() {
+        return null;
+    }
 }

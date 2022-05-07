@@ -3,6 +3,8 @@ package org.lds56.mona.core.interpreter;
 import org.lds56.mona.core.runtime.types.MonaObject;
 import org.lds56.mona.core.runtime.types.MonaUndefined;
 
+import java.util.Objects;
+
 /**
  * @author lds56
  * @date 2022/04/20
@@ -33,23 +35,40 @@ public class Context {
         return _block;
     }
 
-    public MonaObject findGlobal(int negIndex) {
-        Frame outer;;
+    public MonaObject findGlobal(int globalIndex) {
+        String varName = _block.getGlobalVarName(globalIndex);
+        Integer varPos = _block.getGlobalPos(globalIndex);
+        // firstly find in free frame
+        if (_frame.getFree() != null) {
+            if (Objects.equals(_frame.getFree().getLocalName(varPos), varName)) {
+                return _frame.getFree().getLocal(varPos);
+            }
+        }
+        // then find in outer frame
+        Frame outer;
         while ((outer = _frame.getOuter()) != null) {
-            negIndex = outer.getLocalNum() + negIndex;
-            if (negIndex >= 0) {
-                return outer.getLocal(negIndex);
+            if (Objects.equals(outer.getLocalName(varPos), varName)) {
+                return outer.getLocal(varPos);
             }
         }
         return MonaUndefined.UNDEF;
     }
 
-    public void setGlobal(int negIndex, MonaObject value) {
+    public void setGlobal(int globalIndex, MonaObject value) {
+        String varName = _block.getGlobalVarName(globalIndex);
+        Integer varPos = _block.getGlobalPos(globalIndex);
+        // firstly set in free frame
+        if (_frame.getFree() != null) {
+            if (Objects.equals(_frame.getFree().getLocalName(varPos), varName)) {
+                _frame.getFree().setLocal(varPos, value);
+                return;
+            }
+        }
+        // then set in outer frame
         Frame outer;;
         while ((outer = _frame.getOuter()) != null) {
-            negIndex = outer.getLocalNum() + negIndex;
-            if (negIndex >= 0) {
-                outer.setLocal(negIndex, value);
+            if (Objects.equals(outer.getLocalName(varPos), varName)) {
+                outer.setLocal(varPos, value);
                 return;
             }
         }

@@ -16,68 +16,75 @@ import java.util.stream.Collectors;
  */
 public class BasicBlock {
 
-    public String name;
+    public Info info;
 
-    public int startAddress;
+    public Vars vars;
 
     private Instruction[] instructions;
 
-    private MonaObject[] constValues;
-
-    private String[] localVarNames;
-
-    public BasicBlock(String name, int startAddress, Instruction[] instructions, MonaObject[] constValues, String[] localVarNames) {
-        this.name = name;
-        this.startAddress = startAddress;
+    public BasicBlock(Info info, Vars vars, Instruction[] instructions) {
+        this.info = info;
+        this.vars = vars;
         this.instructions = instructions;
-        this.constValues = constValues;
-        this.localVarNames = localVarNames;
     }
 
     public static BasicBlock build(ByteCodeMetadata metadata, ByteCodeBlock block) {
-        return new BasicBlock(metadata.getBlockName(), 0, block.toInstrArray(), metadata.toConstArray(), metadata.toVarNameArray());
+        return BasicBlock.build(block.toInstrArray())
+                         .info(metadata.getBlockName(), 0)
+                         .vars(metadata.toConstArray(), metadata.toVarNameArray(),
+                               metadata.toGlobalNameArray(), metadata.toGlobalPosArray());
     }
 
-
-    public static BasicBlock build(int startAddress, Instruction[] instructions, MonaObject[] constValues, String[] localVarNames) {
-        return new BasicBlock(null, startAddress, instructions, constValues, localVarNames);
+    public static BasicBlock build(Info info, Vars vars, Instruction[] instructions) {
+        return new BasicBlock(info, vars, instructions);
     }
 
-    public void setStartAddress(int startAddress) {
-        this.startAddress = startAddress;
+    public static BasicBlock build(Instruction[] instructions) {
+        return new BasicBlock(null, null, instructions);
     }
 
-    public BasicBlock withName(String name) {
-        this.name = name;
+    public BasicBlock info(String name, Integer startAddress) {
+        this.info = new Info(name, startAddress);
         return this;
     }
 
-    public MonaObject loadConst(int index) {
-        if (index < 0 || index >= constValues.length) {
-            throw new InterpretErrorException("Load const value out of range");
-        }
-        return constValues[index];
+    public BasicBlock vars(MonaObject[] constants, String[] localNames, String[] globalNames, Integer[] globalPos) {
+        this.vars = new Vars(constants, localNames, globalNames, globalPos);
+        return this;
     }
 
-    public MonaObject[] fillLocals(Map<String, Object> inputs) {
-        MonaObject[] locals = new MonaObject[localVarNames.length];
-        for (int i=0; i<locals.length; i++) {
-            if (inputs.containsKey(localVarNames[i])) {
-                locals[i] = MonaObject.wrap(inputs.get(localVarNames[i]));
-            }
-            else {
-                locals[i] = MonaUndefined.UNDEF;
-            }
-        }
-        return locals;
+    public BasicBlock vars(MonaObject[] constants, String[] localNames) {
+        this.vars = new Vars(constants, localNames, null, null);
+        return this;
+    }
+
+    // getters
+    public String name() {
+        return info.name;
+    }
+
+    public Integer startAddress() {
+        return info.startAddress;
+    }
+
+    public String getGlobalVarName(int index) {
+        return vars.globalNames[index];
+    }
+
+    public Integer getGlobalPos(int index) {
+        return vars.globalPos[index];
+    }
+
+    public String[] getLocalNames() {
+        return vars.localNames;
     }
 
     public int getLocalNum() {
-        return localVarNames.length;
+        return vars.localNames.length;
     }
 
     public Instruction instrAt(int line) {
-        return instructions[line - startAddress];
+        return instructions[line - info.startAddress];
     }
 
     public int instrCount() {
@@ -88,13 +95,39 @@ public class BasicBlock {
         return instructions;
     }
 
+
+    // setters
+    public void setStartAddress(int startAddress) {
+        this.info.startAddress = startAddress;
+    }
+
+    public MonaObject loadConst(int index) {
+        if (index < 0 || index >= vars.constants.length) {
+            throw new InterpretErrorException("Load const value out of range");
+        }
+        return vars.constants[index];
+    }
+
+    public MonaObject[] fillLocals(Map<String, Object> inputs) {
+        MonaObject[] locals = new MonaObject[vars.localNames.length];
+        for (int i=0; i<locals.length; i++) {
+            if (inputs.containsKey(vars.localNames[i])) {
+                locals[i] = MonaObject.wrap(inputs.get(vars.localNames[i]));
+            }
+            else {
+                locals[i] = MonaUndefined.UNDEF;
+            }
+        }
+        return locals;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        if (constValues != null && constValues.length > 0)
-            sb.append("CONST: [").append(Arrays.stream(constValues).map(MonaObject::toString).collect(Collectors.joining(","))).append("]\n");
-        if (localVarNames != null && localVarNames.length > 0)
-            sb.append("LOCAL: ").append(Arrays.toString(localVarNames)).append("\n");
+        if (vars.constants != null && vars.constants.length > 0)
+            sb.append("CONST: [").append(Arrays.stream(vars.constants).map(MonaObject::toString).collect(Collectors.joining(","))).append("]\n");
+        if (vars.localNames != null && vars.localNames.length > 0)
+            sb.append("LOCAL: ").append(Arrays.toString(vars.localNames)).append("\n");
         if (instructions != null && instructions.length > 0) {
             for (Instruction instr : instructions) {
                 sb.append(instr.toString()).append("\n");
@@ -102,4 +135,35 @@ public class BasicBlock {
         }
         return sb.toString();
     }
+
+
+    public static class Info {
+        private String name;
+
+        private Integer startAddress;
+
+        public Info(String name, Integer startAddress) {
+            this.name = name;
+            this.startAddress = startAddress;
+        }
+    }
+
+    public static class Vars {
+
+        public MonaObject[] constants;
+
+        public String[] localNames;
+
+        public String[] globalNames;
+
+        public Integer[] globalPos;
+
+        public Vars(MonaObject[] constants, String[] localNames, String[] globalNames, Integer[] globalPos) {
+            this.constants = constants;
+            this.localNames = localNames;
+            this.globalNames = globalNames;
+            this.globalPos = globalPos;
+        }
+    }
+
 }

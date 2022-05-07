@@ -2,6 +2,7 @@ package org.lds56.mona.core.interpreter;
 
 import org.lds56.mona.core.exception.InterpretErrorException;
 import org.lds56.mona.core.runtime.types.MonaObject;
+import org.lds56.mona.core.runtime.types.MonaUndefined;
 
 /**
  * @author lds56
@@ -11,33 +12,43 @@ import org.lds56.mona.core.runtime.types.MonaObject;
  */
 public class Frame {
 
+    private String[] localNames;
+
     private MonaObject[] locals;
 
-    private OperandStack<MonaObject> operandStack;
+    private final OperandStack<MonaObject> operandStack;
 
     private Frame outerFrame;
+
+    private Frame freeFrame;
 
     public Frame() {
         this.operandStack = new OperandStack<>();
     }
 
-    public Frame(MonaObject[] locals) {
+    public Frame(String[] localNames, MonaObject[] locals) {
+        this.localNames = localNames;
         this.locals = locals;
         this.operandStack = new OperandStack<>();
         this.outerFrame = null;
+        this.freeFrame = null;
     }
 
-    public static Frame createWithLocals(MonaObject[] locals) {
-        return new Frame(locals);
+    public static Frame createWithLocals(String[] localNames, MonaObject[] locals) {
+        return new Frame(localNames, locals);
     }
 
-    public static Frame createWithArgs(MonaObject[] args, int localNum) {
+    public static Frame createWithArgs(String[] localNames, MonaObject[] args) {
+        int localNum = localNames.length;
         if (localNum < args.length) {
             throw new InterpretErrorException("Too many args when creating frame");
         }
         MonaObject[] locals = new MonaObject[localNum];
+        for (int i=0; i<localNum; i++) {
+            locals[i] = i < args.length ? args[i] : MonaUndefined.UNDEF;
+        }
         System.arraycopy(args, 0, locals, 0, args.length);
-        return new Frame(locals);
+        return new Frame(localNames, locals);
     }
 
     public Frame withOuter(Frame outerFrame) {
@@ -45,8 +56,17 @@ public class Frame {
         return this;
     }
 
+    public Frame withFree(Frame freeFrame) {
+        this.freeFrame = freeFrame;
+        return this;
+    }
+
     public Frame getOuter() {
         return outerFrame;
+    }
+
+    public Frame getFree() {
+        return freeFrame;
     }
 
     public MonaObject popOperand() {
@@ -74,6 +94,10 @@ public class Frame {
 
     public void setLocal(int idx, MonaObject obj) {
         locals[idx] = obj;
+    }
+
+    public String getLocalName(int idx) {
+        return localNames[idx];
     }
 
     public MonaObject[] getLocals() {

@@ -40,7 +40,7 @@ public class VirtualMach {
 
     public void enterMain(Map<String, Object> inputs) {
         enterBlockAt(Constants.MAIN_BASIC_BLOCK_INDEX);
-        pushFrame(Frame.createWithLocals(nowBlock().fillLocals(inputs)));       // Main frame
+        pushFrame(Frame.createWithLocals(nowBlock().getLocalNames(), nowBlock().fillLocals(inputs)));       // Main frame
         moveToCalleeStart();
     }
 
@@ -81,7 +81,17 @@ public class VirtualMach {
 
     private void moveToCalleeStart() {
         this.backStack.push(this.pc);
-        this.pc = nowBlock().startAddress;
+        this.pc = nowBlock().startAddress();
+    }
+
+    private void pushRetVal(MonaObject retVal, Frame freeFrame) {
+        if (retVal instanceof MonaBB) {
+            // if return function => a closure constructed
+            // attach callee's frame to fucnction
+            // means free variables in closure
+            ((MonaBB)retVal).withFrame(freeFrame);
+        }
+        topFrame().pushOperand(retVal);
     }
 
     public MonaObject run(Map<String, Object> inputs) {
@@ -101,7 +111,7 @@ public class VirtualMach {
     }
 
     public void traceStack(Context ctx, Instruction ins, Signal signal) {
-        String sb = ctx.block().name + " | " + (ctx.pc() - ctx.block().startAddress) + " | " +
+        String sb = ctx.block().name() + " | " + (ctx.pc() - ctx.block().startAddress()) + " | " +
                     ins.getOpCode().repr() + " " + (ins.getArg() == null? "" : ins.getArg()) + "\n" +
                     "local vars: [" + Arrays.stream(ctx.frame().getLocals()).map(Object::toString).collect(Collectors.joining(",")) + "]\n" +
                     "operands: [" + Arrays.stream(ctx.frame().getOperands()).map(Object::toString).collect(Collectors.joining(",")) + "]\n" +
@@ -132,20 +142,21 @@ public class VirtualMach {
                 break;
             case CALL:
                 // enter to callee's basic block
-                boolean selfCall = enterBlockAt(signal.intValue());
+                boolean selfCall = enterBlockAt(signal.bbValue().intValue());
                 // push a new frame for callee
-                pushFrame(Frame.createWithArgs(signal.argsValue(), nowBlock().getLocalNum())
-                               .withOuter(selfCall ? topFrame().getOuter() : topFrame()));
+                pushFrame(Frame.createWithArgs(nowBlock().getLocalNames(), signal.argsValue())
+                               .withOuter(selfCall ? topFrame().getOuter() : topFrame())
+                               .withFree(signal.bbValue().getFreeFrame()));
                 // stash caller address & move to callee address
                 moveToCalleeStart();
                 break;
             case RET:
                 // pop callee's frame
-                popFrame();
+                Frame calleeFrame = popFrame();
                 // exit callee's block
                 exitBlock();
                 // push return value to caller's operand stack top
-                topFrame().pushOperand(signal.objValue());
+                pushRetVal(signal.objValue(), calleeFrame);
                 // move back to caller address
                 moveBackToCaller();
                 // move to the next line of caller
