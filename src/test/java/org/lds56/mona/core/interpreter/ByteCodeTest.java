@@ -284,7 +284,80 @@ public class ByteCodeTest {
         Assertions.assertEquals(res.getValue(), 30);
     }
 
+    @Test
+    public void testRecursion() {
+//        fn fib(n) {
+//        if n == 1 || n == 2 {
+//            return 1;
+//        }
+//        return fib(n-1) + fib(n-2);
+//}
+//        return fib(n);
+        Instruction[] main_instr = new Instruction[] {
+                Instruction.of(OpCode.MAKE_FUNCTION, 1),
+                Instruction.of(OpCode.STORE_LOCAL, 0),
+                Instruction.of(OpCode.LOAD_LOCAL, 0),
+                Instruction.of(OpCode.LOAD_LOCAL, 1),
+                Instruction.of(OpCode.CALL_FUNCTION, 1),
+                Instruction.of(OpCode.RETURN_VALUE),
+        };
 
+        MonaObject[] main_const = new MonaObject[] {
+                MonaNull.NIL,
+        };
+
+        String[] main_vars = new String[] { "fib", "n" };
+
+        Instruction[] fib_instr = new Instruction[] {
+                Instruction.of(OpCode.LOAD_LOCAL, 0),
+                Instruction.of(OpCode.LOAD_CONSTANT, 1),
+                Instruction.of(OpCode.EQUAL),
+                Instruction.of(OpCode.LOAD_LOCAL, 0),
+                Instruction.of(OpCode.LOAD_CONSTANT, 2),
+                Instruction.of(OpCode.EQUAL),
+                Instruction.of(OpCode.LOGIC_OR),
+                Instruction.of(OpCode.BRANCH_FALSE, 10),
+                Instruction.of(OpCode.LOAD_CONSTANT, 1),
+                Instruction.of(OpCode.RETURN_VALUE),
+                Instruction.of(OpCode.LOAD_GLOBAL, 0),
+                Instruction.of(OpCode.LOAD_LOCAL, 0),
+                Instruction.of(OpCode.LOAD_CONSTANT, 1),
+                Instruction.of(OpCode.BINARY_SUBSTRACT),
+                Instruction.of(OpCode.CALL_FUNCTION, 1),
+                Instruction.of(OpCode.LOAD_GLOBAL, 0),
+                Instruction.of(OpCode.LOAD_LOCAL, 0),
+                Instruction.of(OpCode.LOAD_CONSTANT, 2),
+                Instruction.of(OpCode.BINARY_SUBSTRACT),
+                Instruction.of(OpCode.CALL_FUNCTION, 1),
+                Instruction.of(OpCode.BINARY_ADD),
+                Instruction.of(OpCode.RETURN_VALUE),
+        };
+
+        MonaObject[] fib_consts = new MonaObject[] {
+                MonaNull.NIL,
+                MonaNumber.newInteger(1),
+                MonaNumber.newInteger(2),
+        };
+
+        String[] fib_locals = new String[] {"n"};
+
+        String[] fib_globals = new String[] {"fib"};
+
+        Integer[] fib_pos = new Integer[] {0};
+
+        ByteCode code = ByteCode.load(new BasicBlock[]{
+                BasicBlock.build(main_instr).info("__main__", 0).vars(main_const, main_vars),
+                BasicBlock.build(fib_instr).info("__fib__", main_instr.length).vars(fib_consts, fib_locals, fib_globals, fib_pos),
+        });
+
+        VirtualMach vm = VirtualMachFactory.createVM();
+        vm.load(code);
+        MonaObject res = vm.run(TestUtils.inputOf("n", 10));
+
+        System.out.println(res.getValue());
+        // 1 1 2 3 5 8 13 21 34 55
+        Assertions.assertEquals(res.getValue(), 55);
+    }
 
     @Test
     public void testClosure() {
