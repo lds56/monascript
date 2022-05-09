@@ -39,9 +39,12 @@ public class ByteCodeBlock {
     }
 
     public ByteCodeBlock append(ByteCodeBlock block) {
-        this.instrList.addAll(block.instrList);
+        if (block != null) {
+            this.instrList.addAll(block.instrList);
+        }
         return this;
     }
+
 
     public InstructionExt instrAt(int idx) {
         return instrList.get(idx);

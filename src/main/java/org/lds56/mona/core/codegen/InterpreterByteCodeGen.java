@@ -13,7 +13,6 @@ import java.util.Stack;
  * @date 2022/04/22
  * @description byte code gen for interpreter
  */
-// TODO
 public class InterpreterByteCodeGen implements AbastractCodeGen<ByteCodeBlock> {
 
     private final Stack<ByteCodeMetadata> metaStack = new Stack<>();
@@ -21,20 +20,24 @@ public class InterpreterByteCodeGen implements AbastractCodeGen<ByteCodeBlock> {
     private final List<BasicBlock> bbList = new ArrayList<>();
 
     public InterpreterByteCodeGen() {
-        metaStack.push(new ByteCodeMetadata(Constants.MAIN_BASIC_BLOCK_NAME));
+        openBlock(Constants.MAIN_BASIC_BLOCK_NAME);
     }
 
-    public void stash(ByteCodeBlock block) {
+    public void openBlock(String blockName) {
+        metaStack.push(new ByteCodeMetadata(blockName));
+    }
+
+    public void closeBlock(ByteCodeBlock block) {
         // ensure last instruction of each block is RETVAL
         if (!block.instrAt(block.instrCount()-1).getOpCode().equals(OpCode.RETURN_VALUE)) {
             block.append(InstructionExt.of(OpCode.RETURN_VALUE));
         }
-        bbList.add(BasicBlock.build(metaStack.pop(), block));
+        bbList.add(metaStack.size(), BasicBlock.build(metaStack.pop(), block));
     }
 
     public ByteCode generate(ByteCodeBlock mainBlock) {
-        stash(mainBlock);
-        BasicBlock[] bb = new BasicBlock[bbList.size() ];
+        closeBlock(mainBlock);
+        BasicBlock[] bb = new BasicBlock[bbList.size()];
         int startAddr = 0;
         for (int i=0; i<bb.length; i++) {
             bb[i] = bbList.get(i);

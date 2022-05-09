@@ -35,12 +35,25 @@ public class BasicBlock {
                                metadata.toGlobalNameArray(), metadata.toGlobalPosArray());
     }
 
+    public static BasicBlock builder() {
+        return new BasicBlock(null, null, null);
+    }
+
     public static BasicBlock build(Info info, Vars vars, Instruction[] instructions) {
         return new BasicBlock(info, vars, instructions);
     }
 
     public static BasicBlock build(Instruction[] instructions) {
         return new BasicBlock(null, null, instructions);
+    }
+
+    public static BasicBlock make(String name, Integer startAddress) {
+        return new BasicBlock(new Info(name, startAddress), null, null);
+    }
+
+    public BasicBlock instr(Instruction[] instructions) {
+        this.instructions = instructions;
+        return this;
     }
 
     public BasicBlock info(String name, Integer startAddress) {
