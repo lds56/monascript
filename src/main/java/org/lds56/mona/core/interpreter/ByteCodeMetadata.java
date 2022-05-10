@@ -16,11 +16,19 @@ import java.util.Stack;
  */
 public class ByteCodeMetadata {
 
-    public String blockName;
+    public static class Var {
+        public boolean isLocal = true;
+        public int index = -1;
+        public int pos = -1;
+    };
+
+    public String bbName;
+    public int bbIndex;
 
     private final List<MonaObject> constValues;
-
     private final List<String> localVarNames;
+    private final List<String> globalVarNames;
+    private final List<Integer> globalVarPos;
 
     private int loopNo = 0;
     private final Stack<Integer> loopNoStack = new Stack<>();
@@ -30,10 +38,13 @@ public class ByteCodeMetadata {
 
     // private final Stack<> loopBlocks;
 
-    public ByteCodeMetadata(String blockName) {
-        this.blockName = blockName;
+    public ByteCodeMetadata(String bbName, int bbIndex) {
+        this.bbName = bbName;
+        this.bbIndex = bbIndex;
         this.constValues = new ArrayList<>();
         this.localVarNames = new ArrayList<>();
+        this.globalVarNames = new ArrayList<>();
+        this.globalVarPos = new ArrayList<>();
         this.constValues.add(MonaNull.NIL);
         // this.loopBlocks = new Stack<>();
     }
@@ -43,13 +54,31 @@ public class ByteCodeMetadata {
         return constValues.size() - 1;
     }
 
-    public Integer getVarNameIndex(String varName) {
-        int idx = localVarNames.indexOf(varName);
-        if (idx != -1) {
-            return idx;
-        }
+    public Integer newVarNameIndex(String varName) {
         localVarNames.add(varName);
         return localVarNames.size()-1;
+    }
+
+    public Integer getVarNameIndex(String varName) {
+        return localVarNames.indexOf(varName);
+    }
+
+    public Integer getOrNewVarNameIndex(String varName) {
+        int index = localVarNames.indexOf(varName);
+        if (index >= 0) {
+            return index;
+        }
+        return newVarNameIndex(varName);
+    }
+
+    public Integer getGlobalVarIndex(String varName) {
+        return globalVarNames.indexOf(varName);
+    }
+
+    public Integer newGlobalVarIndex(String varName, Integer varPos) {
+        globalVarNames.add(varName);
+        globalVarPos.add(varPos);
+        return globalVarNames.size()-1;
     }
 
     // cond label
@@ -92,10 +121,6 @@ public class ByteCodeMetadata {
         return "LOOP_#" + loopNoStack.peek() + "_END";
     }
 
-    public String getBlockName() {
-        return blockName;
-    }
-
     public MonaObject[] toConstArray() {
         MonaObject[] constArray = new MonaObject[constValues.size()];
         return constValues.toArray(constArray);
@@ -107,10 +132,12 @@ public class ByteCodeMetadata {
     }
 
     public String[] toGlobalNameArray() {
-        return null;
+        String[] varNameArray = new String[globalVarNames.size()];
+        return globalVarNames.toArray(varNameArray);
     }
 
     public Integer[] toGlobalPosArray() {
-        return null;
+        Integer[] posArray = new Integer[globalVarPos.size()];
+        return globalVarPos.toArray(posArray);
     }
 }

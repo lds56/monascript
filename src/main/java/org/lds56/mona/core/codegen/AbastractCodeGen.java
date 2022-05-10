@@ -79,13 +79,17 @@ public interface AbastractCodeGen<T> {
 
     T onTernary(T cond, T lvalue, T rvalue);
 
+    T onDefinition(String name, T value);
+
     T onAssignment(String name, T value);
 
-    T onFunction(List<String> argNames, T funcBody);
+    T onParameters(List<String> argNames);
+
+    T onFunction(T argNames, T funcBody);
 
     T onArguments(List<T> argValues);
 
-    T onFuncCall(T func, T args);
+    T onFuncCall(T func, List<T> args);
 
     T onComma(T last, T value);
 
@@ -104,6 +108,5 @@ public interface AbastractCodeGen<T> {
     T onForIn(String iterName, T list, T loopBody);
 
     // T onLambda(List<String> argNames, dx)
-
 
 }

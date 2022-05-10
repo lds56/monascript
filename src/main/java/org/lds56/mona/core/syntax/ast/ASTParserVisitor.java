@@ -138,10 +138,10 @@ public class ASTParserVisitor<T> extends MonaParserBaseVisitor<T> {
         return codeGen.onTernary(visit(ctx.value_expr()), visit(ctx.expr(0)), visit(ctx.expr(1)));
     }
 
-//    @Override
-//    public T visitParameters(ParametersContext ctx) {
-//        return codeGen.onParameters(ctx.ID().stream().map(ParseTree::getText).collect(Collectors.toList()));
-//    }
+    @Override
+    public T visitParameters(ParametersContext ctx) {
+        return codeGen.onParameters(ctx.ID().stream().map(ParseTree::getText).collect(Collectors.toList()));
+    }
 
     @Override
     public T visitArguments(ArgumentsContext ctx) {
@@ -150,24 +150,23 @@ public class ASTParserVisitor<T> extends MonaParserBaseVisitor<T> {
 
     @Override
     public T visitFuncCallExpr(FuncCallExprContext ctx) {
-        return codeGen.onFuncCall(visit(ctx.value_expr()), visit(ctx.arguments()));
+        return codeGen.onFuncCall(visit(ctx.value_expr()), ctx.arguments().expr().stream().map(this::visit).collect(Collectors.toList()));
     }
 
     @Override
     public T visitFunction(FunctionContext ctx) {
-        return codeGen.onFunction(ctx.parameters().ID().stream().map(ParseTree::getText).collect(Collectors.toList()),
-                                  visit(ctx.block()));
+        return codeGen.onFunction(visit(ctx.parameters()), visit(ctx.block()));
     }
 
     // decl & assignment
     @Override
     public T visitVarAssStat(VarAssStatContext ctx) {  // TODO: change the name `VariableStatContext`
-        return codeGen.onAssignment(ctx.ID().getText(), visit(ctx.expr()));
+        return codeGen.onDefinition(ctx.ID().getText(), visit(ctx.expr()));
     }
 
     @Override
     public T visitFuncAssStat(FuncAssStatContext ctx) {  // TODO: change the name `VariableStatContext`
-        return codeGen.onAssignment(ctx.ID().getText(), visit(ctx.anonymous_func()));
+        return codeGen.onDefinition(ctx.ID().getText(), visit(ctx.anonymous_func()));
     }
 
     @Override

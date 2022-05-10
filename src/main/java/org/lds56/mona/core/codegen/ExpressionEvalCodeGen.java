@@ -199,12 +199,22 @@ public class ExpressionEvalCodeGen implements AbastractCodeGen<MonaObject> {
     }
 
     @Override
+    public MonaObject onDefinition(String name, MonaObject value) {
+        return null;
+    }
+
+    @Override
     public MonaObject onAssignment(String name, MonaObject value) {
         return env.put(name, value);
     }
 
     @Override
-    public MonaObject onFunction(List<String> argNames, MonaObject funcBody) {
+    public MonaObject onParameters(List<String> argNames) {
+        return null;
+    }
+
+    @Override
+    public MonaObject onFunction(MonaObject argNames, MonaObject funcBody) {
         throw new SyntaxNotSupportedException("`Func Def` is not supported in expression evaluation");
     }
 
@@ -214,11 +224,9 @@ public class ExpressionEvalCodeGen implements AbastractCodeGen<MonaObject> {
     }
 
     @Override
-    public MonaObject onFuncCall(MonaObject func, MonaObject args) {
-        if (args instanceof MonaTuple) {
-            return func.invoke(((MonaTuple)args).toArray());
-        }
-        throw new MonaRuntimeException("Invalid arguments for func call");
+    public MonaObject onFuncCall(MonaObject func, List<MonaObject> args) {
+        MonaObject[] argArr = new MonaObject[args.size()];
+        return func.invoke(args.toArray(argArr));
     }
 
     @Override

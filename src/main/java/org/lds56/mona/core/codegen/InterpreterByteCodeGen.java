@@ -1,12 +1,11 @@
 package org.lds56.mona.core.codegen;
 
+import org.lds56.mona.core.exception.SyntaxNotSupportedException;
 import org.lds56.mona.core.interpreter.*;
 import org.lds56.mona.core.interpreter.ir.OpCode;
 import org.lds56.mona.core.runtime.types.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 
 /**
  * @author lds56
@@ -15,16 +14,19 @@ import java.util.Stack;
  */
 public class InterpreterByteCodeGen implements AbastractCodeGen<ByteCodeBlock> {
 
-    private final Stack<ByteCodeMetadata> metaStack = new Stack<>();
+    private final ArrayDeque<ByteCodeMetadata> metaStack = new ArrayDeque<>();
 
     private final List<BasicBlock> bbList = new ArrayList<>();
+
+    private final List<String> globals = new ArrayList<>();
 
     public InterpreterByteCodeGen() {
         openBlock(Constants.MAIN_BASIC_BLOCK_NAME);
     }
 
     public void openBlock(String blockName) {
-        metaStack.push(new ByteCodeMetadata(blockName));
+        metaStack.push(new ByteCodeMetadata(blockName, bbList.size()));
+        bbList.add(BasicBlock.build());
     }
 
     public void closeBlock(ByteCodeBlock block) {
@@ -32,7 +34,8 @@ public class InterpreterByteCodeGen implements AbastractCodeGen<ByteCodeBlock> {
         if (!block.instrAt(block.instrCount()-1).getOpCode().equals(OpCode.RETURN_VALUE)) {
             block.append(InstructionExt.of(OpCode.RETURN_VALUE));
         }
-        bbList.add(metaStack.size(), BasicBlock.build(metaStack.pop(), block));
+        ByteCodeMetadata metadata = metaStack.pop();
+        bbList.set(metadata.bbIndex, BasicBlock.build(metadata, block));
     }
 
     public ByteCode generate(ByteCodeBlock mainBlock) {
@@ -45,6 +48,45 @@ public class InterpreterByteCodeGen implements AbastractCodeGen<ByteCodeBlock> {
             startAddr += bb[i].instrCount();
         }
         return new ByteCode(bb);
+    }
+
+    private ByteCodeMetadata.Var findMetadataVar(String varName) {
+        if (metaStack.isEmpty()) {
+            throw new SyntaxNotSupportedException("Metadata stack is empty");
+        }
+        boolean isTop = true;
+        ByteCodeMetadata.Var metaVar = new ByteCodeMetadata.Var();
+        for (ByteCodeMetadata metadata : metaStack) {
+            // find in local
+            metaVar.index = metadata.getVarNameIndex(varName);
+            if (metaVar.index >= 0) {
+                // top local is local, not top local is not local
+                metaVar.isLocal = isTop;
+                break;
+            }
+            // find in top global
+            if (isTop) {
+                metaVar.index = metadata.getGlobalVarIndex(varName);
+                if (metaVar.index >= 0) {
+                    metaVar.isLocal = false;
+                    break;
+                }
+            }
+            // switch off top
+            isTop = false;
+        }
+        // find in outer
+        if (!isTop) {
+            // if find nowhere, add into global env
+            if (metaVar.index < 0) {
+                globals.add(varName);
+                metaVar.index = globals.size()-1;
+            }
+            // insert into local global varnames
+            metaVar.pos = metaVar.index;
+            metaVar.index = metaStack.peek().newGlobalVarIndex(varName, metaVar.pos);
+        }
+        return metaVar;
     }
 
     @Override
@@ -123,9 +165,9 @@ public class InterpreterByteCodeGen implements AbastractCodeGen<ByteCodeBlock> {
 
     @Override
     public ByteCodeBlock onIdentity(String id) {
+        ByteCodeMetadata.Var metaVar = findMetadataVar(id);
         return ByteCodeBlock.build(
-                InstructionExt.of(OpCode.LOAD_LOCAL, metaStack.peek().getVarNameIndex(id))
-        );
+                InstructionExt.of(metaVar.isLocal? OpCode.LOAD_LOCAL : OpCode.LOAD_GLOBAL, metaVar.index));
     }
 
     @Override
@@ -289,29 +331,44 @@ public class InterpreterByteCodeGen implements AbastractCodeGen<ByteCodeBlock> {
     }
 
     @Override
-    public ByteCodeBlock onAssignment(String name, ByteCodeBlock value) {
+    public ByteCodeBlock onDefinition(String name, ByteCodeBlock value) {
         return ByteCodeBlock.build()
                             .append(value)
-                            .append(InstructionExt.of(OpCode.STORE_LOCAL, metaStack.peek().getVarNameIndex(name)));
+                            .append(InstructionExt.of(OpCode.STORE_LOCAL, metaStack.peek().newVarNameIndex(name)));
     }
 
     @Override
-    public ByteCodeBlock onFunction(List<String> argNames, ByteCodeBlock funcBody) {
+    public ByteCodeBlock onAssignment(String name, ByteCodeBlock value) {
+        ByteCodeMetadata.Var metaVar = findMetadataVar(name);
+        return ByteCodeBlock.build()
+                            .append(value)
+                            .append(InstructionExt.of(metaVar.isLocal? OpCode.STORE_LOCAL : OpCode.STORE_GLOBAL, metaVar.index));
+    }
+
+    @Override
+    public ByteCodeBlock onParameters(List<String> argNames) {
+        openBlock("fff");
+        argNames.forEach(argName -> metaStack.peek().newVarNameIndex(argName));
         return null;
+    }
+
+    @Override
+    public ByteCodeBlock onFunction(ByteCodeBlock argTuple, ByteCodeBlock funcBody) {
+        int bbi = metaStack.peek().bbIndex;
+        closeBlock(funcBody);
+        return ByteCodeBlock.build(InstructionExt.of(OpCode.MAKE_FUNCTION, bbi));
     }
 
     @Override
     public ByteCodeBlock onArguments(List<ByteCodeBlock> argValues) {
-        return null; // MonaTuple.fromList(argValues);
+        return ByteCodeBlock.build().append(argValues);
     }
-
     @Override
-    public ByteCodeBlock onFuncCall(ByteCodeBlock func, ByteCodeBlock args) {
-//        if (args instanceof MonaTuple) {
-//            return func.invoke(((MonaTuple)args).toArray());
-//        }
-//        throw new MonaRuntimeException("Invalid arguments for func call");
-        return null;
+    public ByteCodeBlock onFuncCall(ByteCodeBlock func, List<ByteCodeBlock> args) {
+        return ByteCodeBlock.build()
+                            .append(func)
+                            .append(args)
+                            .append(InstructionExt.of(OpCode.CALL_FUNCTION, args.size()));
     }
 
     @Override
@@ -387,11 +444,12 @@ public class InterpreterByteCodeGen implements AbastractCodeGen<ByteCodeBlock> {
                             .append(InstructionExt.labelOf(metaStack.peek().enterLoopLabel()))
                             .append(InstructionExt.of(OpCode.NEXT_ITERATOR))
                             .append(InstructionExt.of(OpCode.BRANCH_FALSE, metaStack.peek().getLoopEndLabel()))
-                            .append(InstructionExt.of(OpCode.STORE_LOCAL, metaStack.peek().getVarNameIndex(iterName)))
+                            .append(InstructionExt.of(OpCode.STORE_LOCAL, metaStack.peek().getOrNewVarNameIndex(iterName)))
                             .append(loopBody)
                             .append(InstructionExt.of(OpCode.JUMP_LOCAL, metaStack.peek().getLoopStartLabel()))
                             .append(InstructionExt.labelOf(metaStack.peek().exitLoopLabel()));
     }
+
 
 }
 
