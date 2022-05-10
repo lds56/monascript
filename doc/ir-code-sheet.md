@@ -2,10 +2,11 @@
 ## Simple Expression
 `b? 1+2 : 3`
 ```
-CONST_VAL   : [Nil, 1, 2, 3]
-GLOBAL_VAR  : []
-# LOCAL_VAR   : [b]
-0 | LOADL   0 (b)
+CONST_VAL   :   [Nil, 1, 2, 3]
+LOCAL_VAR   :   []
+GLOBAL_VAR  :   [b]
+GLOBAL_POS  :   [0]
+0 | LOADG   0 (b)
 1 | BRF     6
 2 | LOADC   1 (1)
 3 | LOADC   2 (2)
@@ -24,13 +25,14 @@ f(y)
 ```
 __main__
 CONST_VAL   :   [Nil, 'f', 'y']
-GLOBAL_VAR  :   []
-LOCAL_VAR   :   ['f', 'y']
+GLOBAL_VAR  :   [y]
+GLOBAL_POS  :   [0]
+LOCAL_VAR   :   ['f']
 # LOCAL_VAL   :   [_, __f__]
 0 | MAKEF   1    # bb index
 1 | STOREL  0 ('f')  
 2 | LOADL   0 ('f')
-3 | LOADL   1 ('y')
+3 | LOADG   0 ('y')
 4 | CALLF   1
 5 | RETVAL
 __f__
@@ -54,12 +56,13 @@ return x;
 ```
 __main__
 CONST_VAL   :   [Nil, 0, 1]
-GLOBAL_VAR  :   []
-LOCAL_VAR   :   ['x', y']
+GLOBAL_VAR  :   ['y']
+GLOBAL_POS  :   [0]
+LOCAL_VAR   :   ['x']
 0 | LOADC   1
 1 | STOREL  0
 2 | LOADL   0
-3 | LOADL   1
+3 | LOADG   0
 4 | LT
 5 | BRF     11
 6 | LOADL   0
@@ -87,29 +90,29 @@ return ans;
 ```
 __main__
 CONST_VAL   :   [Nil, 0, 2, 1, 10]
-GLOBAL_VAR  :   []
-LOCAL_VAR   :   ['l', ans', 'x']
+GLOBAL_VAR  :   ['l']
+LOCAL_VAR   :   ['ans', 'x']
 0 | LOADC   1
-1 | STOREL  1 (ans)
-2 | LOADL   0
+1 | STOREL  0 (ans)
+2 | LOADG   0 (l)
 3 | ITER            # iterator
 4 | NEXT            # if has next, push next value & true, else only push false
 5 | BRF     20      # for
-6 | STOREL  2 (x)
-7 | LOADL   2 (x)
+6 | STOREL  1 (x)
+7 | LOADL   1 (x)
 8 | LOADC   2 (2)
 9 | MOD
 10| LOADC   3 (1)
 11| BREQ    4       # continue
-12| LOADL   2 (x)
+12| LOADL   1 (x)
 13| LOADC   4 (10)
 14| BRGT    20      # break
-15| LOADL   1 (ans)
-16| LOADL   2 (x)
+15| LOADL   0 (ans)
+16| LOADL   1 (x)
 17| INADD   
-18| STOREL  1 (ans)
+18| STOREL  0 (ans)
 19| JUMPL   4
-20| LOADL   1
+20| LOADL   0
 21| RETVAL
 ```
 ## Func Call Statement II
@@ -160,6 +163,45 @@ fn fib(n) {
     return fib(n-1) + fib(n-2);
 }
 return fib(n);
+```
+```
+__main__
+CONST_VAL   :   [nil]
+LOCAL_VAR   :   [fib]
+GLOBAL_VAR  :   [n]
+0 | MAKEF   1
+1 | STOREL  0
+1 | LOADL   0
+2 | LOADG   0
+3 | CALLF   1
+4 | RETVAL
+__fib__
+CONST_VAL   :   [nil, 1, 2]
+LOCAL_VAR   :   [n]
+GLOBAL_VAR  :   [fib]
+GLOBAL_POS  :   [0]
+0 | LOADL   0
+1 | LOADC   1
+2 | EQ
+3 | LOADL   0
+4 | LOADC   2
+5 | EQ       
+6 | OR
+7 | BRF     10
+8 | LOADC   1
+9 | RETVAL
+10| LOADG   0
+10| LOADL   0
+11| LOADC   1
+12| SUB
+13| CALLF   1
+14| LOADG   0
+15| LOADL   0
+16| LOADC   2
+17| SUB
+18| CALLF   1
+19| ADD
+20| RETVAL 
 ```
 ## Closure
 ```

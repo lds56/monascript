@@ -105,4 +105,19 @@ public class CodeGenTest {
 
         Assertions.assertEquals(result, 15);
     }
+
+    @Test
+    public void testFuncCall() {
+
+        String expr =
+                "let g = 10;" +
+                "let f = fn(x) {" +
+                "   return 2*x + g;" +
+                "}; " +
+                "return f(100);";
+        // System.out.println(interpret(expr));
+        Object result = interpret(expr, TestUtils.inputOf());
+
+        Assertions.assertEquals(result, 210);
+    }
 }

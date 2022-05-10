@@ -21,7 +21,7 @@ public class ByteCodeTest {
 
         // b? 1+1 : 3
         Instruction[] ins = new Instruction[] {
-                Instruction.of(OpCode.LOAD_LOCAL, 0),
+                Instruction.of(OpCode.LOAD_GLOBAL, 0),
                 Instruction.of(OpCode.BRANCH_FALSE, 6),
                 Instruction.of(OpCode.LOAD_CONSTANT, 1),
                 Instruction.of(OpCode.LOAD_CONSTANT, 1),
@@ -41,7 +41,7 @@ public class ByteCodeTest {
         String[] localNames = new String[] {"b"};
         
         ByteCode code = ByteCode.load(new BasicBlock[]{
-                BasicBlock.build(ins).info("__main__", 0).vars(consts, localNames)
+                BasicBlock.build(ins).info("__main__", 0).vars(consts, localNames, new String[] {"b"}, new Integer[] {0})
         });
 
         VirtualMach vm = VirtualMachFactory.createVM();
@@ -65,7 +65,7 @@ public class ByteCodeTest {
                 Instruction.of(OpCode.MAKE_FUNCTION, 1),
                 Instruction.of(OpCode.STORE_LOCAL, 0),
                 Instruction.of(OpCode.LOAD_LOCAL, 0),
-                Instruction.of(OpCode.LOAD_LOCAL, 1),
+                Instruction.of(OpCode.LOAD_GLOBAL, 0),
                 Instruction.of(OpCode.CALL_FUNCTION, 1),
                 Instruction.of(OpCode.RETURN_VALUE)
                 // [Nil, 1, 'f', 2]
@@ -73,11 +73,10 @@ public class ByteCodeTest {
         MonaObject[] consts_main = new MonaObject[] {
                 MonaNull.NIL,
                 MonaString.valueOf("f"),
-                MonaString.valueOf("y"),
                 // MonaNumber.newInteger(1),        // bb index
         };
 
-        String[] localNames_main = new String[] {"f", "y"};
+        String[] localNames_main = new String[] {"f"};
 
         Instruction[] ins_f = new Instruction[] {
                 Instruction.of(OpCode.LOAD_LOCAL, 0),
@@ -95,7 +94,7 @@ public class ByteCodeTest {
         String[] localNames_f = new String[] {"x"};
 
         ByteCode code = ByteCode.load(new BasicBlock[]{
-                BasicBlock.build(ins_main).info("__f__", 0).vars(consts_main, localNames_main),
+                BasicBlock.build(ins_main).info("__f__", 0).vars(consts_main, localNames_main, new String[]{"y"}, new Integer[]{0}),
                 BasicBlock.build(ins_f).info("__main__", ins_main.length).vars(consts_f, localNames_f),
         });
 
@@ -189,7 +188,7 @@ public class ByteCodeTest {
                 Instruction.of(OpCode.LOAD_CONSTANT, 1),
                 Instruction.of(OpCode.STORE_LOCAL, 0),
                 Instruction.of(OpCode.LOAD_LOCAL, 0),
-                Instruction.of(OpCode.LOAD_LOCAL, 1),
+                Instruction.of(OpCode.LOAD_GLOBAL, 0),
                 Instruction.of(OpCode.LESS_THAN),
                 Instruction.of(OpCode.BRANCH_FALSE, 11),
                 Instruction.of(OpCode.LOAD_LOCAL, 0),
@@ -207,10 +206,10 @@ public class ByteCodeTest {
                 MonaNumber.newInteger(1),
         };
 
-        String[] localNames = new String[] {"x", "y"};
+        String[] localNames = new String[] {"x"};
 
         ByteCode code = ByteCode.load(new BasicBlock[]{
-                BasicBlock.build(ins).info("__main__", 0).vars(consts, localNames)
+                BasicBlock.build(ins).info("__main__", 0).vars(consts, localNames, new String[]{"y"}, new Integer[]{0})
         });
 
         VirtualMach vm = VirtualMachFactory.createVM();
@@ -238,26 +237,26 @@ public class ByteCodeTest {
 //        return ans;
         Instruction[] ins = new Instruction[] {
                 Instruction.of(OpCode.LOAD_CONSTANT, 1),
-                Instruction.of(OpCode.STORE_LOCAL, 1),
-                Instruction.of(OpCode.LOAD_LOCAL, 0),
+                Instruction.of(OpCode.STORE_LOCAL, 0),
+                Instruction.of(OpCode.LOAD_GLOBAL, 0),
                 Instruction.of(OpCode.GET_ITERATOR),
                 Instruction.of(OpCode.NEXT_ITERATOR),
                 Instruction.of(OpCode.BRANCH_FALSE, 20),
-                Instruction.of(OpCode.STORE_LOCAL, 2),
-                Instruction.of(OpCode.LOAD_LOCAL, 2),
+                Instruction.of(OpCode.STORE_LOCAL, 1),
+                Instruction.of(OpCode.LOAD_LOCAL, 1),
                 Instruction.of(OpCode.LOAD_CONSTANT, 2),
                 Instruction.of(OpCode.BINARY_MODULO),
                 Instruction.of(OpCode.LOAD_CONSTANT, 3),
                 Instruction.of(OpCode.BRANCH_EQUAL, 4),
-                Instruction.of(OpCode.LOAD_LOCAL, 2),
+                Instruction.of(OpCode.LOAD_LOCAL, 1),
                 Instruction.of(OpCode.LOAD_CONSTANT, 4),
                 Instruction.of(OpCode.BRANCH_GREATER_THAN, 20),
+                Instruction.of(OpCode.LOAD_LOCAL, 0),
                 Instruction.of(OpCode.LOAD_LOCAL, 1),
-                Instruction.of(OpCode.LOAD_LOCAL, 2),
                 Instruction.of(OpCode.INPLACE_ADD),
-                Instruction.of(OpCode.STORE_LOCAL, 1),
+                Instruction.of(OpCode.STORE_LOCAL, 0),
                 Instruction.of(OpCode.JUMP_LOCAL, 4),
-                Instruction.of(OpCode.LOAD_LOCAL, 1),
+                Instruction.of(OpCode.LOAD_LOCAL, 0),
                 Instruction.of(OpCode.RETURN_VALUE),
                 };
 
@@ -269,10 +268,10 @@ public class ByteCodeTest {
                 MonaNumber.newInteger(10),
                 };
 
-        String[] localNames = new String[] {"l", "ans", "x"};
+        String[] localNames = new String[] {"ans", "x"};
 
         ByteCode code = ByteCode.load(new BasicBlock[]{
-                BasicBlock.build(ins).info("__main__", 0).vars(consts, localNames)
+                BasicBlock.build(ins).info("__main__", 0).vars(consts, localNames, new String[]{"l"}, new Integer[]{0})
         });
 
         VirtualMach vm = VirtualMachFactory.createVM();
@@ -297,7 +296,7 @@ public class ByteCodeTest {
                 Instruction.of(OpCode.MAKE_FUNCTION, 1),
                 Instruction.of(OpCode.STORE_LOCAL, 0),
                 Instruction.of(OpCode.LOAD_LOCAL, 0),
-                Instruction.of(OpCode.LOAD_LOCAL, 1),
+                Instruction.of(OpCode.LOAD_GLOBAL, 0),
                 Instruction.of(OpCode.CALL_FUNCTION, 1),
                 Instruction.of(OpCode.RETURN_VALUE),
         };
@@ -346,7 +345,7 @@ public class ByteCodeTest {
         Integer[] fib_pos = new Integer[] {0};
 
         ByteCode code = ByteCode.load(new BasicBlock[]{
-                BasicBlock.build(main_instr).info("__main__", 0).vars(main_const, main_vars),
+                BasicBlock.build(main_instr).info("__main__", 0).vars(main_const, main_vars, new String[]{"n"}, new Integer[]{0}),
                 BasicBlock.build(fib_instr).info("__fib__", main_instr.length).vars(fib_consts, fib_locals, fib_globals, fib_pos),
         });
 
