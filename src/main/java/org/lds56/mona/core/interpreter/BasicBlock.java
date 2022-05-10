@@ -22,15 +22,25 @@ public class BasicBlock {
 
     private Instruction[] instructions;
 
+    public BasicBlock() {
+        this.info = null;
+        this.vars = null;
+        this.instructions = null;
+    }
+
     public BasicBlock(Info info, Vars vars, Instruction[] instructions) {
         this.info = info;
         this.vars = vars;
         this.instructions = instructions;
     }
 
+    public static BasicBlock build() {
+        return new BasicBlock(null, null, null);
+    }
+
     public static BasicBlock build(ByteCodeMetadata metadata, ByteCodeBlock block) {
         return BasicBlock.build(block.toInstrArray())
-                         .info(metadata.getBlockName(), 0)
+                         .info(metadata.bbName, metadata.bbIndex, 0)
                          .vars(metadata.toConstArray(), metadata.toVarNameArray(),
                                metadata.toGlobalNameArray(), metadata.toGlobalPosArray());
     }
@@ -47,9 +57,6 @@ public class BasicBlock {
         return new BasicBlock(null, null, instructions);
     }
 
-    public static BasicBlock make(String name, Integer startAddress) {
-        return new BasicBlock(new Info(name, startAddress), null, null);
-    }
 
     public BasicBlock instr(Instruction[] instructions) {
         this.instructions = instructions;
@@ -57,7 +64,12 @@ public class BasicBlock {
     }
 
     public BasicBlock info(String name, Integer startAddress) {
-        this.info = new Info(name, startAddress);
+        this.info = new Info(name, -1, startAddress);
+        return this;
+    }
+
+    public BasicBlock info(String name, Integer index, Integer startAddress) {
+        this.info = new Info(name, index, startAddress);
         return this;
     }
 
@@ -67,7 +79,7 @@ public class BasicBlock {
     }
 
     public BasicBlock vars(MonaObject[] constants, String[] localNames) {
-        this.vars = new Vars(constants, localNames, null, null);
+        this.vars = new Vars(constants, localNames, new String[]{}, new Integer[]{});
         return this;
     }
 
@@ -86,6 +98,10 @@ public class BasicBlock {
 
     public Integer getGlobalPos(int index) {
         return vars.globalPos[index];
+    }
+
+    public String[] getGlobalNames() {
+        return vars.globalNames;
     }
 
     public String[] getLocalNames() {
@@ -112,6 +128,10 @@ public class BasicBlock {
     // setters
     public void setStartAddress(int startAddress) {
         this.info.startAddress = startAddress;
+    }
+
+    public void setIndex(int index) {
+        this.info.index = index;
     }
 
     public MonaObject loadConst(int index) {
@@ -151,12 +171,16 @@ public class BasicBlock {
 
 
     public static class Info {
+
         private String name;
+
+        private Integer index;
 
         private Integer startAddress;
 
-        public Info(String name, Integer startAddress) {
+        public Info(String name, Integer index, Integer startAddress) {
             this.name = name;
+            this.index = index;
             this.startAddress = startAddress;
         }
     }

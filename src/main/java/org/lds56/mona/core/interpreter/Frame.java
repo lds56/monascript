@@ -4,6 +4,9 @@ import org.lds56.mona.core.exception.InterpretErrorException;
 import org.lds56.mona.core.runtime.types.MonaObject;
 import org.lds56.mona.core.runtime.types.MonaUndefined;
 
+import java.util.Arrays;
+import java.util.Map;
+
 /**
  * @author lds56
  * @date 2022/04/21
@@ -32,6 +35,17 @@ public class Frame {
         this.operandStack = new OperandStack<>();
         this.outerFrame = null;
         this.freeFrame = null;
+    }
+
+    public static Frame createWithGlobals(Map<String, Object> inputs, String[] globalNames, String[] localNames) {
+        MonaObject[] globals = new MonaObject[globalNames.length];
+        for (int i=0; i<globals.length; i++) {
+            globals[i] = inputs.containsKey(globalNames[i])? MonaObject.wrap(inputs.get(globalNames[i])) : MonaUndefined.UNDEF;
+        }
+        Frame globalFrame = new Frame(globalNames, globals);
+        MonaObject[] locals = new MonaObject[localNames.length];
+        Arrays.fill(locals, MonaUndefined.UNDEF);
+        return new Frame(localNames, locals).withOuter(globalFrame);
     }
 
     public static Frame createWithLocals(String[] localNames, MonaObject[] locals) {

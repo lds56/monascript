@@ -45,6 +45,12 @@ public class ByteCodeBlock {
         return this;
     }
 
+    public ByteCodeBlock append(List<ByteCodeBlock> blocks) {
+        if (blocks != null) {
+            blocks.forEach(this::append);
+        }
+        return this;
+    }
 
     public InstructionExt instrAt(int idx) {
         return instrList.get(idx);
