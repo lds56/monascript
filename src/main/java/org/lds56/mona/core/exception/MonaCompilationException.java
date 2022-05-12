@@ -3,7 +3,7 @@ package org.lds56.mona.core.exception;
 /**
  * @author lds56
  * @date 2022/04/07
- * @description Exception during compilation of chopper script
+ * @description Exception during compilation of mona script
  */
 public class MonaCompilationException extends RuntimeException {
 

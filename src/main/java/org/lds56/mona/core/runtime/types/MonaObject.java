@@ -7,7 +7,6 @@ import org.lds56.mona.core.exception.TypeBadCastException;
 // import org.apache.commons.beanutils.PropertyUtils;
 
 import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Iterator;
@@ -105,27 +104,27 @@ public abstract class MonaObject implements Serializable {
 //    }
 
     public MonaObject invoke(MonaObject[] args) {
-        throw new InvokeErrorException("Not a callable chopper object");
+        throw new InvokeErrorException("Not a callable mona object");
     }
 
     public static MonaObject wrap(Object o) {
-        // chopper x
+        // mona x
         if (o == null) {
             return MonaNull.NIL;
         }
-        // chooper o
+        // mona o
         if (o instanceof MonaObject) {
             return (MonaObject) o;
         }
-        // chopper n
+        // mona n
         if (o instanceof Number) {
             return MonaNumber.valueOf((Number)o);
         }
-        // chopper s
+        // mona s
         if (o instanceof String || o instanceof Character) {
             return MonaString.valueOf(o.toString());
         }
-        // chopper b
+        // mona b
         if (o instanceof Boolean) {
             return MonaBoolean.valueOf((Boolean)o);
         }

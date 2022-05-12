@@ -19,6 +19,7 @@ stat
 
 complex_stat
     : block                               # blockStat
+    | FUNCTION ID parameters block        # funcStat
     | RETURN expr SEMI_COLON              # returnStat
     | CONTINUE SEMI_COLON                 # continueStat
     | BREAK SEMI_COLON                    # breakStat

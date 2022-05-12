@@ -88,4 +88,10 @@ public class MonaBoolean extends MonaObject {
     public BigDecimal bigDecValue() {
         return BigDecimal.valueOf(value? 1d: 0d);
     }
+
+
+    @Override
+    public String toString() {
+        return value? "true" : "false";
+    }
 }

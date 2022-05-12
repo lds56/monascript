@@ -161,6 +161,9 @@ public class BasicBlock {
             sb.append("CONST: [").append(Arrays.stream(vars.constants).map(MonaObject::toString).collect(Collectors.joining(","))).append("]\n");
         if (vars.localNames != null && vars.localNames.length > 0)
             sb.append("LOCAL: ").append(Arrays.toString(vars.localNames)).append("\n");
+        if (vars.constants != null && vars.constants.length > 0) {
+            sb.append("GLOBAL: ").append(Arrays.toString(vars.globalNames)).append("\n");
+        }
         if (instructions != null && instructions.length > 0) {
             for (Instruction instr : instructions) {
                 sb.append(instr.toString()).append("\n");

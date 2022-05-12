@@ -85,7 +85,9 @@ public interface AbastractCodeGen<T> {
 
     T onParameters(List<String> argNames);
 
-    T onFunction(T argNames, T funcBody);
+    T onFuncArgs(List<String> argNames);
+
+    T onFunction(List<String> argNames, T funcBody);
 
     T onArguments(List<T> argValues);
 
@@ -104,6 +106,8 @@ public interface AbastractCodeGen<T> {
     T onBreak();
 
     T onWhile(T cond, T loopBody);
+
+    T onIter(String iterName);
 
     T onForIn(String iterName, T list, T loopBody);
 

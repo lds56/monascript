@@ -165,7 +165,7 @@ public class MonaJavaType extends MonaObject {
         return result != null ? MonaObject.wrap(result) : MonaNull.NIL;
     }
 
-    // TODO: return chopper object
+    // TODO: return mona object
     @Override
     public Iterator<?> iterator() {
         final Object value = getValue();

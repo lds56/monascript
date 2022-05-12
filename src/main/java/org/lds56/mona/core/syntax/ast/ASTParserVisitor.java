@@ -6,6 +6,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.lds56.mona.core.syntax.antlr.MonaParser.*;
 import org.lds56.mona.core.syntax.antlr.MonaParserBaseVisitor;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class ASTParserVisitor<T> extends MonaParserBaseVisitor<T> {
@@ -155,7 +156,9 @@ public class ASTParserVisitor<T> extends MonaParserBaseVisitor<T> {
 
     @Override
     public T visitFunction(FunctionContext ctx) {
-        return codeGen.onFunction(visit(ctx.parameters()), visit(ctx.block()));
+        List<String> paramList = ctx.parameters().ID().stream().map(ParseTree::getText).collect(Collectors.toList());
+        codeGen.onFuncArgs(paramList);
+        return codeGen.onFunction(paramList, visit(ctx.block()));
     }
 
     // decl & assignment
@@ -185,6 +188,13 @@ public class ASTParserVisitor<T> extends MonaParserBaseVisitor<T> {
         return ctx.stat().stream()
                   .map(this::visit)
                   .reduce(codeGen.onEmpty(), (acc, e) -> codeGen.onComma(acc, e));
+    }
+
+    @Override
+    public T visitFuncStat(FuncStatContext ctx) {
+        List<String> paramList = ctx.parameters().ID().stream().map(ParseTree::getText).collect(Collectors.toList());
+        codeGen.onFuncArgs(paramList);
+        return codeGen.onDefinition(ctx.ID().getText(), codeGen.onFunction(paramList, visit(ctx.block())));
     }
 
     @Override
@@ -241,6 +251,7 @@ public class ASTParserVisitor<T> extends MonaParserBaseVisitor<T> {
 
     @Override
     public T visitForStat(ForStatContext ctx) {
+        codeGen.onIter(ctx.ID().getText());
         return codeGen.onForIn(ctx.ID().getText(), visit(ctx.expr()), visit(ctx.block()));
     }
 
