@@ -27,20 +27,39 @@ public class VirtualMach {
 
     public int pc;        // program counter
 
-    public VirtualMach() {}
+    private Boolean traceInfo;
+
+    public VirtualMach() {
+        this.traceInfo = false;
+    }
+
+    public VirtualMach(Boolean traceInfo) {
+        this.traceInfo = traceInfo;
+    }
 
     public void load(ByteCode byteCode) {
         this.byteCode = byteCode;
-        this.pc = Constants.MAIN_BASIC_BLOCK_EXIT_LINE; // TODO: make it last line
+        this.pc = Constants.MAIN_BASIC_BLOCK_EXIT_LINE;
         this.frameStack = new Stack<>();
-        this.frameStack.push(new Frame());      // Global frame
         this.blockStack = new Stack<>();
         this.backStack = new Stack<>();
     }
 
+    public boolean reset() {
+        if (byteCode == null || frameStack == null || blockStack == null || backStack == null) {
+            return false;
+        }
+        this.pc = Constants.MAIN_BASIC_BLOCK_EXIT_LINE;
+        this.frameStack.clear();
+        this.blockStack.clear();
+        this.backStack.clear();
+        return true;
+    }
+
     public void enterMain(Map<String, Object> inputs) {
         enterBlockAt(Constants.MAIN_BASIC_BLOCK_INDEX);
-        pushFrame(Frame.createWithGlobals(inputs, nowBlock().getGlobalNames(), nowBlock().getLocalNames()));       // Main frame
+        pushFrame(Frame.createWithGlobals(nowBlock().getGlobalNames(), inputs));                // Global frame
+        pushFrame(Frame.createWithLocals(nowBlock().getLocalNames()).withOuter(topFrame()));    // Main frame
         moveToCalleeStart();
     }
 
@@ -126,10 +145,9 @@ public class VirtualMach {
         Instruction ins = blockStack.peek().instrAt(pc);     // Or maybe retrieve instruction from full instru
         Signal signal = ins.visit(ctx);
 
-        // if (MonaEngine.getEngineMode().getEnabled(EngineOption.IR_CODE_TRACE_STACK_PRINT_SWITCH)) {
-
+        if (traceInfo) {
             traceStack(ctx, ins, signal);
-//        }
+        }
 
         switch (signal.type()) {
             case NEXT:

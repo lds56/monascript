@@ -8,7 +8,7 @@ import org.lds56.mona.core.interpreter.ir.OpCode;
  * @description Instruction with label extension
  *
  */
-public class InstructionExt extends org.lds56.mona.core.interpreter.Instruction {
+public class InstructionExt extends Instruction {
 
     private String jumpLabel = null;
 

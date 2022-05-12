@@ -31,7 +31,7 @@ public class InterpreterByteCodeGen implements AbastractCodeGen<ByteCodeBlock> {
 
     public void closeBlock(ByteCodeBlock block) {
         // ensure last instruction of each block is RETVAL
-        if (!block.instrAt(block.instrCount()-1).getOpCode().equals(OpCode.RETURN_VALUE)) {
+        if (!Objects.equals(block.instrAt(block.instrCount()-1).getOpCode(), OpCode.RETURN_VALUE)) {
             block.append(InstructionExt.of(OpCode.RETURN_VALUE));
         }
         ByteCodeMetadata metadata = metaStack.pop();
@@ -323,12 +323,15 @@ public class InterpreterByteCodeGen implements AbastractCodeGen<ByteCodeBlock> {
 
     @Override
     public ByteCodeBlock onTernary(ByteCodeBlock cond, ByteCodeBlock lvalue, ByteCodeBlock rvalue) {
-        return ByteCodeBlock.build()
-                            .append(cond)
-                            .append(InstructionExt.of(OpCode.BRANCH_FALSE, lvalue.instrCount()))
-                            .append(lvalue)
-                            .append(InstructionExt.of(OpCode.JUMP_LOCAL, rvalue.instrCount()))
-                            .append(rvalue);
+        return onIfElse(cond, lvalue, rvalue);
+//        return ByteCodeBlock.build()
+//                            .append(cond)
+//                            .append(InstructionExt.of(OpCode.BRANCH_FALSE, metaStack.peek().getCondElseLabel(1)))
+//                            .append(lvalue)
+//                            .append(InstructionExt.of(OpCode.JUMP_LOCAL, metaStack.peek().getCondEndLabel(0)))
+//                            .append(InstructionExt.labelOf(metaStack.peek().getCondElseLabel(0)))
+//                            .append(rvalue)
+//                            .append(InstructionExt.labelOf(metaStack.peek().getCondEndLabel(-1)));
     }
 
     @Override

@@ -37,15 +37,18 @@ public class Frame {
         this.freeFrame = null;
     }
 
-    public static Frame createWithGlobals(Map<String, Object> inputs, String[] globalNames, String[] localNames) {
+    public static Frame createWithGlobals(String[] globalNames, Map<String, Object> inputs) {
         MonaObject[] globals = new MonaObject[globalNames.length];
         for (int i=0; i<globals.length; i++) {
             globals[i] = inputs.containsKey(globalNames[i])? MonaObject.wrap(inputs.get(globalNames[i])) : MonaUndefined.UNDEF;
         }
-        Frame globalFrame = new Frame(globalNames, globals);
+        return new Frame(globalNames, globals);
+    }
+
+    public static Frame createWithLocals(String[] localNames) {
         MonaObject[] locals = new MonaObject[localNames.length];
         Arrays.fill(locals, MonaUndefined.UNDEF);
-        return new Frame(localNames, locals).withOuter(globalFrame);
+        return new Frame(localNames, locals);
     }
 
     public static Frame createWithLocals(String[] localNames, MonaObject[] locals) {
