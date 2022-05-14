@@ -50,8 +50,10 @@ public class Signal {
         return _argsValue;
     }
 
+    public static final Signal NEXT_SIGNAL = new Signal(Type.NEXT, null, null, null);
+
     public static Signal emitNext() {
-        return new Signal(Type.NEXT, null, null, null);
+        return NEXT_SIGNAL;
     }
 
     public static Signal emitJump(int jumpLine) {

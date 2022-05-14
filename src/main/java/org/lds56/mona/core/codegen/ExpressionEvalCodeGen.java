@@ -1,6 +1,5 @@
 package org.lds56.mona.core.codegen;
 
-import org.lds56.mona.core.exception.MonaRuntimeException;
 import org.lds56.mona.core.exception.SyntaxNotSupportedException;
 import org.lds56.mona.core.runtime.MonaCalculator;
 import org.lds56.mona.core.runtime.types.*;
@@ -214,7 +213,12 @@ public class ExpressionEvalCodeGen implements AbastractCodeGen<MonaObject> {
     }
 
     @Override
-    public MonaObject onFunction(MonaObject argNames, MonaObject funcBody) {
+    public MonaObject onFuncArgs(List<String> argNames) {
+        return null;
+    }
+
+    @Override
+    public MonaObject onFunction(List<String> argNames, MonaObject funcBody) {
         throw new SyntaxNotSupportedException("`Func Def` is not supported in expression evaluation");
     }
 
@@ -262,6 +266,11 @@ public class ExpressionEvalCodeGen implements AbastractCodeGen<MonaObject> {
     @Override
     public MonaObject onWhile(MonaObject cond, MonaObject loopBody) {
         throw new SyntaxNotSupportedException("`While` is not supported in expression evaluation");
+    }
+
+    @Override
+    public MonaObject onIter(String iterName) {
+        return null;
     }
 
     @Override

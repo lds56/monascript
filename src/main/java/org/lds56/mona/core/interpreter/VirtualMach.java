@@ -3,10 +3,11 @@ package org.lds56.mona.core.interpreter;
 import org.lds56.mona.core.exception.InterpretErrorException;
 import org.lds56.mona.core.interpreter.ir.Signal;
 import org.lds56.mona.core.runtime.types.MonaObject;
+import org.lds56.mona.utils.EasyStack;
+import org.lds56.mona.utils.PointerStack;
 
 import java.util.Arrays;
 import java.util.Map;
-import java.util.Stack;
 import java.util.stream.Collectors;
 
 /**
@@ -19,15 +20,17 @@ public class VirtualMach {
 
     private ByteCode byteCode;
 
-    private Stack<Frame> frameStack;
+    private EasyStack<Frame> frameStack;
 
-    private Stack<BasicBlock> blockStack;
+    private EasyStack<BasicBlock> blockStack;
 
-    private Stack<Integer> backStack;
+    private EasyStack<Integer> backStack;
 
     public int pc;        // program counter
 
     private Boolean traceInfo;
+
+    private Context ctx;
 
     public VirtualMach() {
         this.traceInfo = false;
@@ -40,9 +43,10 @@ public class VirtualMach {
     public void load(ByteCode byteCode) {
         this.byteCode = byteCode;
         this.pc = Constants.MAIN_BASIC_BLOCK_EXIT_LINE;
-        this.frameStack = new Stack<>();
-        this.blockStack = new Stack<>();
-        this.backStack = new Stack<>();
+        this.frameStack = new PointerStack<>();
+        this.blockStack = new PointerStack<>();
+        this.backStack = new PointerStack<>();
+        this.ctx = new Context();
     }
 
     public boolean reset() {
@@ -113,6 +117,10 @@ public class VirtualMach {
         topFrame().pushOperand(retVal);
     }
 
+    private void updateContext() {
+        ctx.update(pc, frameStack.peek(), blockStack.peek());
+    }
+
     public MonaObject run(Map<String, Object> inputs) {
 
         if (byteCode == null) {
@@ -133,15 +141,16 @@ public class VirtualMach {
         String sb = ctx.block().name() + " | " + (ctx.pc() - ctx.block().startAddress()) + " | " +
                     ins.getOpCode().repr() + " " + (ins.getArg() == null? "" : ins.getArg()) + "\n" +
                     "local vars: [" + Arrays.stream(ctx.frame().getLocals()).map(Object::toString).collect(Collectors.joining(",")) + "]\n" +
-                    "operands: [" + Arrays.stream(ctx.frame().getOperands()).map(Object::toString).collect(Collectors.joining(",")) + "]\n" +
+                    "operands: [" + ctx.frame().getOperands().stream().map(Object::toString).collect(Collectors.joining(",")) + "]\n" +
                     "signal: " + signal.type().toString();
         System.out.println(sb);
     }
 
     public void next() {
 
-        // TODO: context can be reused
-        Context ctx = new Context(pc, frameStack.peek(), blockStack.peek());
+        // update current context
+        updateContext();
+
         Instruction ins = blockStack.peek().instrAt(pc);     // Or maybe retrieve instruction from full instru
         Signal signal = ins.visit(ctx);
 

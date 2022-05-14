@@ -1,14 +1,13 @@
 package org.lds56.mona.core.interpreter.ir;
 
 import org.lds56.mona.core.interpreter.Context;
-import org.lds56.mona.core.runtime.MonaCalculator;
 import org.lds56.mona.core.interpreter.MonaBB;
+import org.lds56.mona.core.runtime.MonaCalculator;
 import org.lds56.mona.core.runtime.types.MonaBoolean;
 import org.lds56.mona.core.runtime.types.MonaIter;
 import org.lds56.mona.core.runtime.types.MonaObject;
 
 import java.util.function.BinaryOperator;
-import java.util.function.UnaryOperator;
 
 public class OpLogic {
 
@@ -20,23 +19,38 @@ public class OpLogic {
 
     // Arithmetic
     public static Signal Add(Context context, Integer unused) {
-        return BinaryOpLogic(context, MonaCalculator::add);
+        MonaObject rhs = context.frame().popOperand();
+        MonaObject lhs = context.frame().popOperand();
+        context.frame().pushOperand(MonaCalculator.add(lhs, rhs));
+        return Signal.emitNext();
     }
 
     public static Signal Substract(Context context, Integer unused) {
-        return BinaryOpLogic(context, MonaCalculator::sub);
+        MonaObject rhs = context.frame().popOperand();
+        MonaObject lhs = context.frame().popOperand();
+        context.frame().pushOperand(MonaCalculator.sub(lhs, rhs));
+        return Signal.emitNext();
     }
 
     public static Signal Multiply(Context context, Integer unused) {
-        return BinaryOpLogic(context, MonaCalculator::mult);
+        MonaObject rhs = context.frame().popOperand();
+        MonaObject lhs = context.frame().popOperand();
+        context.frame().pushOperand(MonaCalculator.mult(lhs, rhs));
+        return Signal.emitNext();
     }
 
     public static Signal Divide(Context context, Integer unused) {
-        return BinaryOpLogic(context, MonaCalculator::div);
+        MonaObject rhs = context.frame().popOperand();
+        MonaObject lhs = context.frame().popOperand();
+        context.frame().pushOperand(MonaCalculator.div(lhs, rhs));
+        return Signal.emitNext();
     }
 
     public static Signal Modulo(Context context, Integer unused) {
-        return BinaryOpLogic(context, MonaCalculator::mod);
+        MonaObject rhs = context.frame().popOperand();
+        MonaObject lhs = context.frame().popOperand();
+        context.frame().pushOperand(MonaCalculator.mod(lhs, rhs));
+        return Signal.emitNext();
     }
 
     public static Signal Postive(Context context, Integer unused) {
@@ -44,37 +58,55 @@ public class OpLogic {
     }
 
     public static Signal Negative(Context context, Integer unused) {
-        return UnaryOpLogic(context, MonaCalculator::neg);
+        context.frame().pushOperand(MonaCalculator.neg(context.frame().popOperand()));
+        return Signal.emitNext();
     }
 
     // Logic
     public static Signal LogicAnd(Context context, Integer unused) {
-        return BinaryOpLogic(context, MonaCalculator::and);
+        MonaObject rhs = context.frame().popOperand();
+        MonaObject lhs = context.frame().popOperand();
+        context.frame().pushOperand(MonaCalculator.and(lhs, rhs));
+        return Signal.emitNext();
     }
 
     public static Signal LogicOr(Context context, Integer unused) {
-        return BinaryOpLogic(context, MonaCalculator::or);
+        MonaObject rhs = context.frame().popOperand();
+        MonaObject lhs = context.frame().popOperand();
+        context.frame().pushOperand(MonaCalculator.or(lhs, rhs));
+        return Signal.emitNext();
     }
 
     public static Signal LogicNot(Context context, Integer unused) {
-        return UnaryOpLogic(context, MonaCalculator::not);
+        context.frame().pushOperand(MonaCalculator.not(context.frame().popOperand()));
+        return Signal.emitNext();
     }
 
     // Bitwise
     public static Signal BitAnd(Context context, Integer unused) {
-        return BinaryOpLogic(context, MonaCalculator::bitAnd);
+        MonaObject rhs = context.frame().popOperand();
+        MonaObject lhs = context.frame().popOperand();
+        context.frame().pushOperand(MonaCalculator.bitAnd(lhs, rhs));
+        return Signal.emitNext();
     }
 
     public static Signal BitOr(Context context, Integer unused) {
-        return BinaryOpLogic(context, MonaCalculator::bitOr);
+        MonaObject rhs = context.frame().popOperand();
+        MonaObject lhs = context.frame().popOperand();
+        context.frame().pushOperand(MonaCalculator.bitOr(lhs, rhs));
+        return Signal.emitNext();
     }
 
     public static Signal BitXor(Context context, Integer unused) {
-        return BinaryOpLogic(context, MonaCalculator::bitXor);
+        MonaObject rhs = context.frame().popOperand();
+        MonaObject lhs = context.frame().popOperand();
+        context.frame().pushOperand(MonaCalculator.bitXor(lhs, rhs));
+        return Signal.emitNext();
     }
 
     public static Signal BitNot(Context context, Integer unused) {
-        return UnaryOpLogic(context, MonaCalculator::bitNot);
+        context.frame().pushOperand(MonaCalculator.bitNot(context.frame().popOperand()));
+        return Signal.emitNext();
     }
 
     // Inplace Arithmetic
@@ -88,27 +120,45 @@ public class OpLogic {
 
     // Comparation
     public static Signal Equal(Context context, Integer unused) {
-        return BinaryOpLogic(context, MonaCalculator::eq);
+        MonaObject rhs = context.frame().popOperand();
+        MonaObject lhs = context.frame().popOperand();
+        context.frame().pushOperand(MonaCalculator.eq(lhs, rhs));
+        return Signal.emitNext();
     }
 
     public static Signal NotEqual(Context context, Integer unused) {
-        return BinaryOpLogic(context, MonaCalculator::neq);
+        MonaObject rhs = context.frame().popOperand();
+        MonaObject lhs = context.frame().popOperand();
+        context.frame().pushOperand(MonaCalculator.neq(lhs, rhs));
+        return Signal.emitNext();
     }
 
     public static Signal GreaterThan(Context context, Integer unused) {
-        return BinaryOpLogic(context, MonaCalculator::gt);
+        MonaObject rhs = context.frame().popOperand();
+        MonaObject lhs = context.frame().popOperand();
+        context.frame().pushOperand(MonaCalculator.gt(lhs, rhs));
+        return Signal.emitNext();
     }
 
     public static Signal LessThan(Context context, Integer unused) {
-        return BinaryOpLogic(context, MonaCalculator::lt);
+        MonaObject rhs = context.frame().popOperand();
+        MonaObject lhs = context.frame().popOperand();
+        context.frame().pushOperand(MonaCalculator.lt(lhs, rhs));
+        return Signal.emitNext();
     }
 
     public static Signal GreaterThanOrEqual(Context context, Integer unused) {
-        return BinaryOpLogic(context, MonaCalculator::gte);
+        MonaObject rhs = context.frame().popOperand();
+        MonaObject lhs = context.frame().popOperand();
+        context.frame().pushOperand(MonaCalculator.gte(lhs, rhs));
+        return Signal.emitNext();
     }
 
     public static Signal LessThanOrEqual(Context context, Integer unused) {
-        return BinaryOpLogic(context, MonaCalculator::lte);
+        MonaObject rhs = context.frame().popOperand();
+        MonaObject lhs = context.frame().popOperand();
+        context.frame().pushOperand(MonaCalculator.lte(lhs, rhs));
+        return Signal.emitNext();
     }
 
     // Data
@@ -235,18 +285,18 @@ public class OpLogic {
         return Signal.emitNext();
     }
 
-    private static Signal UnaryOpLogic(Context context, UnaryOperator<MonaObject> unaryOp) {
-        MonaObject value = context.frame().popOperand();
-        context.frame().pushOperand(unaryOp.apply(value));
-        return Signal.emitNext();
-    }
-
-    private static Signal BinaryOpLogic(Context context, BinaryOperator<MonaObject> binaryOp) {
-        MonaObject rhs = context.frame().popOperand();
-        MonaObject lhs = context.frame().popOperand();
-        context.frame().pushOperand(binaryOp.apply(lhs, rhs));
-        return Signal.emitNext();
-    }
+//    private static Signal UnaryOpLogic(Context context, UnaryOperator<MonaObject> unaryOp) {
+//        MonaObject value = context.frame().popOperand();
+//        context.frame().pushOperand(unaryOp.apply(value));
+//        return Signal.emitNext();
+//    }
+//
+//    private static Signal BinaryOpLogic(Context context, BinaryOperator<MonaObject> binaryOp) {
+//        MonaObject rhs = context.frame().popOperand();
+//        MonaObject lhs = context.frame().popOperand();
+//        context.frame().pushOperand(binaryOp.apply(lhs, rhs));
+//        return Signal.emitNext();
+//    }
 
 
     private static Signal BranchBinaryOpLogic(Context context, Integer index, BinaryOperator<MonaObject> binaryOp) {

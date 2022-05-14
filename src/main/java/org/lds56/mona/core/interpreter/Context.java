@@ -13,13 +13,23 @@ import java.util.Objects;
  */
 public class Context {
 
-    private final Frame _frame;
+    private Frame _frame;
 
-    private final BasicBlock _block;
+    private BasicBlock _block;
 
     public int _pc;        // program counter
 
+    public Context() {
+        this(0, null, null);
+    }
+
     public Context(int pc, Frame frame, BasicBlock block) {
+        this._pc = pc;
+        this._frame = frame;
+        this._block = block;
+    }
+
+    public void update(int pc, Frame frame, BasicBlock block) {
         this._pc = pc;
         this._frame = frame;
         this._block = block;
