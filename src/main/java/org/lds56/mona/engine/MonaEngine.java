@@ -1,6 +1,7 @@
 package org.lds56.mona.engine;
 
 import org.lds56.mona.core.script.ScriptComposer;
+import org.lds56.mona.script.MonaExpression;
 import org.lds56.mona.script.MonaScript;
 import org.lds56.mona.utils.MD5Utils;
 
@@ -54,13 +55,13 @@ public class MonaEngine {
 
     // script
     public MonaScript compile(String code) {
+
         String key = MD5Utils.encode(code);
         if (scriptCache.containsKey(key)) {
             return scriptCache.get(key);
         }
         return ScriptComposer.create(code);
     }
-
 
     public Object execute(String code) {
         MonaScript script = compile(code);
@@ -70,5 +71,10 @@ public class MonaEngine {
     public Object execute(String code, Map<String, Object> context) {
         MonaScript script = compile(code);
         return script.execute(context);
+    }
+
+    // expression
+    public Object evaluate(String expr, Map<String, Object> context) {
+        return new MonaExpression(expr).evaluate(context);
     }
 }
