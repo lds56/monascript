@@ -4,6 +4,7 @@ package org.lds56.mona.core.runtime.types;
 import org.lds56.mona.core.exception.ContextAccessException;
 import org.lds56.mona.core.exception.InvokeErrorException;
 import org.lds56.mona.core.exception.TypeBadCastException;
+import org.lds56.mona.core.runtime.collections.MonaIter;
 // import org.apache.commons.beanutils.PropertyUtils;
 
 import java.io.Serializable;

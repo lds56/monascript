@@ -14,6 +14,7 @@ public enum MonaType implements Serializable {
     Boolean,
     String,
     JavaType,
+    Dict,
     Collection,
     Null,
     Undefined,

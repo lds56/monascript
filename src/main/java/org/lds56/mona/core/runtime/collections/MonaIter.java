@@ -1,4 +1,8 @@
-package org.lds56.mona.core.runtime.types;
+package org.lds56.mona.core.runtime.collections;
+
+import org.lds56.mona.core.runtime.types.MonaNType;
+import org.lds56.mona.core.runtime.types.MonaObject;
+import org.lds56.mona.core.runtime.types.MonaType;
 
 import java.util.Iterator;
 
