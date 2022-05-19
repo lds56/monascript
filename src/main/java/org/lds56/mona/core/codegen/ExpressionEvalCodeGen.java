@@ -2,6 +2,10 @@ package org.lds56.mona.core.codegen;
 
 import org.lds56.mona.core.exception.SyntaxNotSupportedException;
 import org.lds56.mona.core.runtime.MonaCalculator;
+import org.lds56.mona.core.runtime.collections.MonaDict;
+import org.lds56.mona.core.runtime.collections.MonaList;
+import org.lds56.mona.core.runtime.collections.MonaSet;
+import org.lds56.mona.core.runtime.collections.MonaTuple;
 import org.lds56.mona.core.runtime.types.*;
 
 import java.util.HashMap;
@@ -39,17 +43,17 @@ public class ExpressionEvalCodeGen implements AbastractCodeGen<MonaObject> {
 
     @Override
     public MonaObject onList(List<MonaObject> l) {
-        return null;
+        return MonaList.newList(l);
     }
 
     @Override
     public MonaObject onSet(List<MonaObject> l) {
-        return null;
+        return MonaSet.newSet(l);
     }
 
     @Override
-    public MonaObject onMap(String[] keys, List<MonaObject> values) {
-        return null;
+    public MonaObject onMap(List<MonaObject> keys, List<MonaObject> values) {
+        return MonaDict.newDict(keys, values);
     }
 
     @Override

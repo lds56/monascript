@@ -29,7 +29,7 @@ public interface AbastractCodeGen<T> {
 
     T onSet(List<T> l);
 
-    T onMap(String[] keys, List<T> values);
+    T onMap(List<T> keys, List<T> values);
 
     T onRange(int start, int end);
 

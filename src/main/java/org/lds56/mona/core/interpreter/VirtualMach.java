@@ -3,8 +3,8 @@ package org.lds56.mona.core.interpreter;
 import org.lds56.mona.core.exception.InterpretErrorException;
 import org.lds56.mona.core.interpreter.ir.Signal;
 import org.lds56.mona.core.runtime.types.MonaObject;
+import org.lds56.mona.utils.ArrayStack;
 import org.lds56.mona.utils.EasyStack;
-import org.lds56.mona.utils.PointerStack;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -43,9 +43,9 @@ public class VirtualMach {
     public void load(ByteCode byteCode) {
         this.byteCode = byteCode;
         this.pc = Constants.MAIN_BASIC_BLOCK_EXIT_LINE;
-        this.frameStack = new PointerStack<>();
-        this.blockStack = new PointerStack<>();
-        this.backStack = new PointerStack<>();
+        this.frameStack = new ArrayStack<>();
+        this.blockStack = new ArrayStack<>();
+        this.backStack = new ArrayStack<>();
         this.ctx = new Context();
     }
 

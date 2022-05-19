@@ -4,7 +4,7 @@ import org.lds56.mona.core.interpreter.Context;
 import org.lds56.mona.core.interpreter.MonaBB;
 import org.lds56.mona.core.runtime.MonaCalculator;
 import org.lds56.mona.core.runtime.types.MonaBoolean;
-import org.lds56.mona.core.runtime.types.MonaIter;
+import org.lds56.mona.core.runtime.collections.MonaIter;
 import org.lds56.mona.core.runtime.types.MonaObject;
 
 import java.util.function.BinaryOperator;

@@ -120,7 +120,7 @@ public class InterpreterByteCodeGen implements AbastractCodeGen<ByteCodeBlock> {
     }
 
     @Override
-    public ByteCodeBlock onMap(String[] keys, List<ByteCodeBlock> values) {
+    public ByteCodeBlock onMap(List<ByteCodeBlock> keys, List<ByteCodeBlock> values) {
         return null;
     }
 

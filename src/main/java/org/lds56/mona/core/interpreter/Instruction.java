@@ -36,7 +36,7 @@ public class Instruction {
         return arg;
     }
 
-    public Signal visit(org.lds56.mona.core.interpreter.Context context) {
+    public Signal visit(Context context) {
         return opCode.apply(context, arg);
     }
 

@@ -51,4 +51,5 @@ public class ScriptComposer {
 
         return new BytecodeScript(bc);
     }
+
 }

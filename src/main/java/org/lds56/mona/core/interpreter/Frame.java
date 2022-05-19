@@ -3,8 +3,8 @@ package org.lds56.mona.core.interpreter;
 import org.lds56.mona.core.exception.InterpretErrorException;
 import org.lds56.mona.core.runtime.types.MonaObject;
 import org.lds56.mona.core.runtime.types.MonaUndefined;
+import org.lds56.mona.utils.ArrayStack;
 import org.lds56.mona.utils.EasyStack;
-import org.lds56.mona.utils.PointerStack;
 
 import java.util.Arrays;
 import java.util.List;
@@ -29,13 +29,13 @@ public class Frame {
     private Frame freeFrame;
 
     public Frame() {
-        this.operandStack = new PointerStack<>();
+        this.operandStack = new ArrayStack<>();
     }
 
     public Frame(String[] localNames, MonaObject[] locals) {
         this.localNames = localNames;
         this.locals = locals;
-        this.operandStack = new PointerStack<>();
+        this.operandStack = new ArrayStack<>();
         this.outerFrame = null;
         this.freeFrame = null;
     }
