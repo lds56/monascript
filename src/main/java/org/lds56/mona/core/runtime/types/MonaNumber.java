@@ -1,11 +1,12 @@
 package org.lds56.mona.core.runtime.types;
 
 import org.lds56.mona.core.exception.TypeBadCastException;
+import org.lds56.mona.core.runtime.traits.MonaHashable;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-public class MonaNumber extends MonaObject {
+public class MonaNumber extends MonaObject implements MonaHashable {
 
     // private static final double MAGIC_DOUBLE = -12345678d;
     public static final MonaNumber NAN = new MonaNumber(Double.NaN, MonaNType.E);
@@ -228,5 +229,10 @@ public class MonaNumber extends MonaObject {
     @Override
     public String toString() {
         return stringValue();
+    }
+
+    @Override
+    public int hash() {
+        return value.hashCode();
     }
 }

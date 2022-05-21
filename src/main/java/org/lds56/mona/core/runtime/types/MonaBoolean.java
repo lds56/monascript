@@ -1,5 +1,7 @@
 package org.lds56.mona.core.runtime.types;
 
+import org.lds56.mona.core.runtime.traits.MonaHashable;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
@@ -8,7 +10,7 @@ import java.math.BigInteger;
  * @Date: 30 Apr 2022
  * @Description: Boolean Type 『真実はひとつ』
  */
-public class MonaBoolean extends MonaObject {
+public class MonaBoolean extends MonaObject implements MonaHashable {
 
     public static final MonaBoolean TRUE = new MonaBoolean(Boolean.TRUE);
 
@@ -93,5 +95,10 @@ public class MonaBoolean extends MonaObject {
     @Override
     public String toString() {
         return value? "true" : "false";
+    }
+
+    @Override
+    public int hash() {
+        return value.hashCode();
     }
 }

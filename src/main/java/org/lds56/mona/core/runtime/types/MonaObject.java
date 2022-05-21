@@ -1,16 +1,16 @@
 package org.lds56.mona.core.runtime.types;
 
 // import org.lds56.mona.core.compiler.method.MethodFactory;
-import org.lds56.mona.core.exception.ContextAccessException;
-import org.lds56.mona.core.exception.InvokeErrorException;
+
 import org.lds56.mona.core.exception.TypeBadCastException;
-import org.lds56.mona.core.runtime.collections.MonaIter;
-// import org.apache.commons.beanutils.PropertyUtils;
+import org.lds56.mona.core.runtime.traits.MonaHashable;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Iterator;
+import java.util.Objects;
+
+// import org.apache.commons.beanutils.PropertyUtils;
 
 public abstract class MonaObject implements Serializable {
 
@@ -65,21 +65,6 @@ public abstract class MonaObject implements Serializable {
         return booleanValue();
     }
 
-    /**
-     * Access array, list or map element
-     */
-    public MonaObject getElement(final MonaObject indexObject) {
-        throw new ContextAccessException("Not a list or map");
-    }
-
-    public Iterator<?> iterator() {
-        throw new ContextAccessException("Not a iterator collection");
-    }
-
-
-    public MonaIter iter() {
-        throw new ContextAccessException("Not a iter collection");
-    }
 //
 //    public MonaObject getProperty(String propName) {
 //        try {
@@ -103,10 +88,6 @@ public abstract class MonaObject implements Serializable {
 ////            throw new ExpressionRuntimeException("No such a method: " + methodName, e);
 ////        }
 //    }
-
-    public MonaObject invoke(MonaObject[] args) {
-        throw new InvokeErrorException("Not a callable mona object");
-    }
 
     public static MonaObject wrap(Object o) {
         // mona x
@@ -135,5 +116,21 @@ public abstract class MonaObject implements Serializable {
     @Override
     public String toString() {
         return "MonaObject|" + this.getClass().getSimpleName();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof MonaObject) {
+            return Objects.equals(this.getValue(), ((MonaObject)o).getValue());
+        }
+        return Objects.equals(this.getValue(), o);
+    }
+
+    @Override
+    public int hashCode() {
+        if (this instanceof MonaHashable) {
+            return ((MonaHashable) this).hash();
+        }
+        return super.hashCode();
     }
 }

@@ -1,9 +1,11 @@
 package org.lds56.mona.core.runtime.types;
 
+import org.lds56.mona.core.runtime.traits.MonaHashable;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-public class MonaString extends MonaObject {
+public class MonaString extends MonaObject implements MonaHashable {
 
     // constants
     public static final MonaString EMPTY = new MonaString("");
@@ -122,5 +124,10 @@ public class MonaString extends MonaObject {
     @Override
     public String toString() {
         return stringValue();
+    }
+
+    @Override
+    public int hash() {
+        return value.hashCode();
     }
 }

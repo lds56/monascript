@@ -14,14 +14,11 @@ public enum MonaType implements Serializable {
     Boolean,
     String,
     JavaType,
-    Dict,
-    Collection,
     Null,
     Undefined,
-    Method,
-    Function,
-    Lambda,
-    Tuple
+    Collection,
+    Iter,
+    Function
     ;
 
     public static boolean isNull(MonaObject a) {
