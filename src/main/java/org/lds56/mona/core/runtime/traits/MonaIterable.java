@@ -1,4 +1,7 @@
-package org.lds56.mona.core.runtime.collections;
+package org.lds56.mona.core.runtime.traits;
+
+import org.lds56.mona.core.runtime.collections.MonaCollType;
+import org.lds56.mona.core.runtime.collections.MonaIter;
 
 import java.util.Iterator;
 
@@ -7,7 +10,7 @@ import java.util.Iterator;
  * @Date: 19 May 2022
  * @Description: This is description.
  */
-public interface MonaCollection {
+public interface MonaIterable {
 
     Iterator<?> iterator();
 
