@@ -6,17 +6,11 @@ import org.lds56.mona.core.runtime.types.MonaType;
 
 import java.util.Iterator;
 
-public class MonaIter extends MonaObject implements Iterator<MonaObject> {
-
-    private final Iterator<?> iter;
-
-    public MonaIter(Iterator<?> iter) {
-        this.iter = iter;
-    }
+public abstract class MonaIter extends MonaObject implements Iterator<MonaObject> {
 
     @Override
     public MonaType getMonaType() {
-        return MonaType.Collection;
+        return MonaType.Iter;
     }
 
     @Override
@@ -24,18 +18,4 @@ public class MonaIter extends MonaObject implements Iterator<MonaObject> {
         return MonaNType.E;
     }
 
-    @Override
-    public Object getValue() {
-        return iter;
-    }
-
-    @Override
-    public boolean hasNext() {
-        return iter.hasNext();
-    }
-
-    @Override
-    public MonaObject next() {
-        return MonaObject.wrap(iter.next());
-    }
 }

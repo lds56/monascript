@@ -1,12 +1,13 @@
 package org.lds56.mona.core.runtime.collections;
 
+import org.lds56.mona.core.runtime.traits.MonaIterable;
 import org.lds56.mona.core.runtime.types.MonaNType;
 import org.lds56.mona.core.runtime.types.MonaObject;
 import org.lds56.mona.core.runtime.types.MonaType;
 
 import java.util.*;
 
-public class MonaSet extends MonaObject implements MonaCollection {
+public class MonaSet extends MonaObject implements MonaIterable {
 
     private final Set<MonaObject> set;
 
@@ -14,7 +15,7 @@ public class MonaSet extends MonaObject implements MonaCollection {
         this.set = set;
     }
 
-    public static MonaSet newSet(MonaObject[] objects) {
+    public static MonaSet newSet(MonaObject... objects) {
         Set<MonaObject> s = new HashSet<>();
         Collections.addAll(s, objects);
         return new MonaSet(s);
@@ -46,7 +47,7 @@ public class MonaSet extends MonaObject implements MonaCollection {
 
     @Override
     public MonaIter iter() {
-        return new MonaIter(set.iterator());
+        return new MonaCollIter(set.iterator());
     }
 
 
@@ -57,6 +58,11 @@ public class MonaSet extends MonaObject implements MonaCollection {
 
     public Boolean contain(MonaObject key) {
         return set.contains(key);
+    }
+
+    @Override
+    public String toString() {
+        return "set" + set.toString();
     }
 
     // public MonaObject get()

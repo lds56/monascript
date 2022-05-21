@@ -1,13 +1,17 @@
 package org.lds56.mona.core.runtime.collections;
 
 import org.lds56.mona.core.exception.OutOfBoundException;
+import org.lds56.mona.core.runtime.traits.MonaIndexable;
+import org.lds56.mona.core.runtime.traits.MonaIterable;
 import org.lds56.mona.core.runtime.types.MonaNType;
 import org.lds56.mona.core.runtime.types.MonaObject;
 import org.lds56.mona.core.runtime.types.MonaType;
 
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
-public class MonaTuple extends MonaObject implements MonaCollection {
+public class MonaTuple extends MonaObject implements MonaIterable, MonaIndexable {
 
     private final MonaObject[] value;
 
@@ -37,12 +41,22 @@ public class MonaTuple extends MonaObject implements MonaCollection {
 
     @Override
     public MonaType getMonaType() {
-        return MonaType.Tuple;
+        return MonaType.Collection;
     }
 
     @Override
     public MonaNType getNType() {
         return MonaNType.E;
+    }
+
+    @Override
+    public Iterator<?> iterator() {
+        return null;
+    }
+
+    @Override
+    public MonaIter iter() {
+        return null;
     }
 
     @Override
@@ -68,5 +82,15 @@ public class MonaTuple extends MonaObject implements MonaCollection {
             throw new OutOfBoundException("Out of bound");
         }
         return value[idx];
+    }
+
+    @Override
+    public MonaObject index(MonaObject index) {
+        return at(index.intValue());
+    }
+
+    @Override
+    public String toString() {
+        return "tp" + Arrays.toString(value);
     }
 }
