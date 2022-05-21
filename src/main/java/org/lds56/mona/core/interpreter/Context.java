@@ -83,4 +83,15 @@ public class Context {
             }
         }
     }
+
+    public MonaObject[] popArgs(int argNum) {
+        // rightmost is top
+        // push args from left to right
+        // pop args from right to left
+        MonaObject[] args = new MonaObject[argNum];
+        for (int i=0; i<argNum; i++) {
+            args[argNum - i - 1] = _frame.popOperand();
+        }
+        return args;
+    }
 }

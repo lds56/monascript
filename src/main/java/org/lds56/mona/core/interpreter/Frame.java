@@ -40,10 +40,11 @@ public class Frame {
         this.freeFrame = null;
     }
 
-    public static Frame createWithGlobals(String[] globalNames, Map<String, Object> inputs) {
+    public static Frame createWithGlobals(String[] globalNames, MonaObject[] globalConsts, Map<String, Object> inputs) {
         MonaObject[] globals = new MonaObject[globalNames.length];
         for (int i=0; i<globals.length; i++) {
-            globals[i] = inputs.containsKey(globalNames[i])? MonaObject.wrap(inputs.get(globalNames[i])) : MonaUndefined.UNDEF;
+            globals[i] = inputs.containsKey(globalNames[i])?
+                    MonaObject.wrap(inputs.get(globalNames[i])) : globalConsts[i];
         }
         return new Frame(globalNames, globals);
     }

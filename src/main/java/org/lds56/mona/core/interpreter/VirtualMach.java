@@ -62,7 +62,7 @@ public class VirtualMach {
 
     public void enterMain(Map<String, Object> inputs) {
         enterBlockAt(Constants.MAIN_BASIC_BLOCK_INDEX);
-        pushFrame(Frame.createWithGlobals(nowBlock().getGlobalNames(), inputs));                // Global frame
+        pushFrame(Frame.createWithGlobals(nowBlock().getGlobalNames(), byteCode.getMainGlobals(), inputs));                // Global frame
         pushFrame(Frame.createWithLocals(nowBlock().getLocalNames()).withOuter(topFrame()));    // Main frame
         moveToCalleeStart();
     }

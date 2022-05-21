@@ -111,17 +111,26 @@ public class InterpreterByteCodeGen implements AbastractCodeGen<ByteCodeBlock> {
 
     @Override
     public ByteCodeBlock onList(List<ByteCodeBlock> l) {
-        return null;
+        return ByteCodeBlock.build()
+                            .append(InstructionExt.of(OpCode.LOAD_GLOBAL, findMetadataVar("coll.list").index))
+                            .append(l)
+                            .append(InstructionExt.of(OpCode.CALL_OBJECT, l.size()));
     }
 
     @Override
     public ByteCodeBlock onSet(List<ByteCodeBlock> l) {
-        return null;
+        return ByteCodeBlock.build()
+                            .append(InstructionExt.of(OpCode.LOAD_GLOBAL, findMetadataVar("coll.set").index))
+                            .append(l)
+                            .append(InstructionExt.of(OpCode.CALL_OBJECT, l.size()));
     }
 
     @Override
-    public ByteCodeBlock onMap(List<ByteCodeBlock> keys, List<ByteCodeBlock> values) {
-        return null;
+    public ByteCodeBlock onMap(List<ByteCodeBlock> kv) {
+        return ByteCodeBlock.build()
+                            .append(InstructionExt.of(OpCode.LOAD_GLOBAL, findMetadataVar("coll.dict").index))
+                            .append(kv)
+                            .append(InstructionExt.of(OpCode.CALL_OBJECT, kv.size()));
     }
 
     @Override
@@ -169,6 +178,19 @@ public class InterpreterByteCodeGen implements AbastractCodeGen<ByteCodeBlock> {
         ByteCodeMetadata.Var metaVar = findMetadataVar(id);
         return ByteCodeBlock.build(
                 InstructionExt.of(metaVar.isLocal? OpCode.LOAD_LOCAL : OpCode.LOAD_GLOBAL, metaVar.index));
+    }
+
+    @Override
+    public ByteCodeBlock onIndex(ByteCodeBlock obj, ByteCodeBlock index) {
+        return ByteCodeBlock.build()
+                .append(obj)
+                .append(index)
+                .append(InstructionExt.of(OpCode.INDEX_ACCESS));
+    }
+
+    @Override
+    public ByteCodeBlock onDot(ByteCodeBlock obj, String attr) {
+        return null;
     }
 
     @Override

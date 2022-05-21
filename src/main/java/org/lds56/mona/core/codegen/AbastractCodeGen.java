@@ -29,11 +29,17 @@ public interface AbastractCodeGen<T> {
 
     T onSet(List<T> l);
 
-    T onMap(List<T> keys, List<T> values);
+    // T onMap(List<T> keys, List<T> values);
+
+    T onMap(List<T> kv);
 
     T onRange(int start, int end);
 
     T onIdentity(String id);
+
+    T onIndex(T obj, T index);
+
+    T onDot(T obj, String attr);
 
     T onAdd(T lhs, T rhs);
 

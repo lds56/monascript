@@ -61,7 +61,9 @@ public class ArrayStack<T> implements EasyStack<T> {
     }
 
     public T[] toArray() {
-        return (T[]) stack;
+        Object[] arr = new Object[stackTop+1];
+        System.arraycopy(stack, 0, arr, 0, stackTop+1);
+        return (T[]) arr;
     }
 
     @Override

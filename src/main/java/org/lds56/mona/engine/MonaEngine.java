@@ -25,7 +25,7 @@ public class MonaEngine {
     static {
         engineMode = EngineOptions
                         .setUp()
-                        // .setOption(EngineOption.IR_CODE_TRACE_STACK_PRINT_SWITCH, true)
+                        .setOption(EngineOption.IR_CODE_TRACE_STACK_PRINT_SWITCH, true)
                         .setOption(EngineOption.SCRIPT_EXECUTION_MODE, EngineOption.Choice.BYTECODE_SCRIPT);
     }
 

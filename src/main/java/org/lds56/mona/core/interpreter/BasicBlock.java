@@ -104,6 +104,10 @@ public class BasicBlock {
         return vars.globalNames;
     }
 
+    public int getGlobalNum() {
+        return vars.globalNames.length;
+    }
+
     public String[] getLocalNames() {
         return vars.localNames;
     }
