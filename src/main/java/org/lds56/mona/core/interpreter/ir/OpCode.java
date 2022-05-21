@@ -129,10 +129,15 @@ public enum OpCode {
 
     CALL_METHOD_VARARG("VCALLM"),
 
+    CALL_OBJECT("CALLO", OpLogic::CallObject),
+
     // Collection Operations
     GET_ITERATOR("ITER", OpLogic::GetIterator),
 
     NEXT_ITERATOR("NEXT", OpLogic::NextIterator),
+
+    // Index Operations
+    INDEX_ACCESS("INDEX", OpLogic::IndexAccess),
 
     // Make Operations
     MAKE_FUNCTION("MAKEF", OpLogic::MakeFunction),
