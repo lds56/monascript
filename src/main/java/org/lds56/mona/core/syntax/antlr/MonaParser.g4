@@ -56,13 +56,14 @@ anonymous_func
 expr
     : <assoc=right> ID ASSIGN value_expr                                   # assignmentExpr
     | <assoc=right> identity op=(SELF_ADD | SELF_SUB | SELF_MUL | SELF_DIV | SELF_MOD) value_expr   # selfAssignmentExpr
-    | <assoc=right> value_expr QUESTION expr COLON expr  # ternaryExpr
+    | <assoc=right> value_expr QUESTION expr COLON expr  # ternaryExpr      // TODO: Move to below
     | value_expr                # valueExpr
     ;
 
 value_expr
-    : value_expr (memberAccess)+    # memberExpr
-    | value_expr arguments          # funcCallExpr
+    : value_expr LBRACKET value_expr RBRACKET    # memberIndex
+    | value_expr DOT ID                    # memberDot
+    | value_expr arguments                 # funcCallExpr
     // | ID COLON ID arguments   # namespaceFuncExpr
 
     | value_expr op=(MUL | DIV | MOD) value_expr              # multExpr
@@ -100,22 +101,22 @@ literal
     ;
 
 collLiteral
-    :   LBRACKET ( expr (COMMA expr)* )? RBRACKET                   # arrayLiteral
-    |   LBRACKET ( expr COMMA)* DOOOT RBRACKET                     # listLiteral
-    |   LBRACE   ((mapEntry (COMMA mapEntry)*) | COLON ) RBRACE    # mapLiteral
+    // :   LBRACKET ( expr (COMMA expr)* )? RBRACKET                   # arrayLiteral
+    :   LBRACKET ( expr (COMMA expr)* )? RBRACKET                  # listLiteral
     |   LBRACE   ( expr (COMMA expr)* )? RBRACE                    # setLiteral
-    |   INTEGER (DOOT | DOOOT) INTEGER                                     # rangeLiteral
+    |   LBRACE   ((mapEntry (COMMA mapEntry)*) | COLON ) RBRACE    # mapLiteral
+    |   INTEGER   (DOOT | DOOOT) INTEGER                                     # rangeLiteral
     ;
 
 mapEntry
     :   expr COLON expr
     ;
 
-memberAccess
-    : LBRACKET expr RBRACKET    # memberIndex
-    | DOT ID arguments          # memberMethod
-    | DOT ID                    # memberProp
-    ;
+//memberAccess
+//    : LBRACKET expr RBRACKET    # memberIndex
+//    | DOT ID arguments          # memberMethod
+//    | DOT ID                    # memberProp
+//    ;
 
 identity
     : ID
