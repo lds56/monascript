@@ -10,7 +10,6 @@ import org.lds56.mona.core.runtime.types.MonaString;
 import org.lds56.mona.core.util.TestUtils;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -447,4 +446,6 @@ public class ByteCodeTest {
         System.out.println(res.getValue());
         Assertions.assertEquals(res.getValue(), 6);
     }
+
+
 }

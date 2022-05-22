@@ -6,10 +6,15 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.lds56.mona.core.codegen.InterpreterByteCodeGen;
+import org.lds56.mona.core.runtime.functions.MonaFunction;
+import org.lds56.mona.core.runtime.types.MonaObject;
 import org.lds56.mona.core.syntax.antlr.MonaLexer;
 import org.lds56.mona.core.syntax.antlr.MonaParser;
 import org.lds56.mona.core.syntax.ast.ASTParserVisitor;
 import org.lds56.mona.core.util.TestUtils;
+import org.lds56.mona.library.java.coll.NewDictFunction;
+import org.lds56.mona.library.java.coll.NewListFunction;
+import org.lds56.mona.library.java.coll.NewSetFunction;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -21,8 +26,16 @@ public class CodeGenTest {
         return interpret(expr, new HashMap<>());
     }
 
-
     Object interpret(String expr, Map<String, Object> ctx) {
+
+        MonaFunction f1 = MonaFunction.newFunc(new NewListFunction());
+        MonaFunction f2 = MonaFunction.newFunc(new NewDictFunction());
+        MonaFunction f3 = MonaFunction.newFunc(new NewSetFunction());
+
+        Map<String, MonaObject> m = new HashMap<>();
+        m.put(f1.getName(), f1);
+        m.put(f2.getName(), f2);
+        m.put(f3.getName(), f3);
 
         CodePointCharStream inputStream = CharStreams.fromString(expr);
         MonaLexer lexer = new MonaLexer(inputStream);
@@ -35,6 +48,7 @@ public class CodeGenTest {
 
         ByteCodeBlock mainBlock = vistor.visit(parser.script());
         ByteCode bc = codegen.generate(mainBlock);
+        bc.fillMainGlobals(m);
 
         // print
         for (BasicBlock bb : bc.getBasicBlocks()) {
@@ -52,12 +66,21 @@ public class CodeGenTest {
     }
 
     @Test
-    public void testAddGen() {
+    public void testAdd() {
 
         String expr = "1+1";
         Object result = interpret(expr);
 
         Assertions.assertEquals(result, 2);
+    }
+
+    @Test
+    public void testExpr() {
+
+        String expr = "(a+b*c/d-1>3)? a+b : a-b";
+        Object result = interpret(expr, TestUtils.inputOf("a", 1, "b", 2, "c", 3, "d", 4));
+
+        Assertions.assertEquals(result, -1);
     }
 
     @Test
@@ -119,5 +142,39 @@ public class CodeGenTest {
         Object result = interpret(expr, TestUtils.inputOf());
 
         Assertions.assertEquals(result, 210);
+    }
+
+    @Test
+    public void testClosure() {
+
+        String expr =
+                "fn addgen(x) {\n" +
+                "    fn adder(y) {\n" +
+                "        return x+y;\n" +
+                "    }\n" +
+                "    return adder;\n" +
+                "}\n" +
+                "let adder1 = addgen(1);\n" +
+                "let adder2 = addgen(2);\n" +
+                "return adder1(1) + adder2(2);";
+
+        // System.out.println(interpret(expr));
+        Object result = interpret(expr, TestUtils.inputOf());
+
+        Assertions.assertEquals(result, 6);
+    }
+
+    @Test
+    public void testList() {
+
+        String expr =
+                "let l = [1,2,3];\n" +
+                "let m = {1: \"1\", \"2\": 2};\n" +
+                "return l[1] + m[\"2\"];";
+
+        // System.out.println(interpret(expr));
+        Object result = interpret(expr, TestUtils.inputOf());
+
+        Assertions.assertEquals(result, 4);
     }
 }
