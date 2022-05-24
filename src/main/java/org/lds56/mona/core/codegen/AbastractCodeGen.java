@@ -29,8 +29,6 @@ public interface AbastractCodeGen<T> {
 
     T onSet(List<T> l);
 
-    // T onMap(List<T> keys, List<T> values);
-
     T onMap(List<T> kv);
 
     T onRange(int start, int end);

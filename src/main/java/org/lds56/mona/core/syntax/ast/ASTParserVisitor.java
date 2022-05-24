@@ -19,6 +19,11 @@ public class ASTParserVisitor<T> extends MonaParserBaseVisitor<T> {
 
     // basic literals
     @Override
+    public T visitNilLiteral(NilLiteralContext ctx) {
+        return codeGen.onNull();
+    }
+
+    @Override
     public T visitStringLiteral(StringLiteralContext ctx) {
         return codeGen.onString(ctx.STRING().getText());
     }
@@ -36,6 +41,16 @@ public class ASTParserVisitor<T> extends MonaParserBaseVisitor<T> {
     @Override
     public T visitFloatLiteral(FloatLiteralContext ctx) {
         return codeGen.onFloat(Float.parseFloat(ctx.FLOAT().getText()));
+    }
+
+    @Override
+    public T visitDoubleLiteral(DoubleLiteralContext ctx) {
+        return codeGen.onDouble(Float.parseFloat(ctx.DOUBLE().getText()));
+    }
+
+    @Override
+    public T visitBooleanLiteral(BooleanLiteralContext ctx) {
+        return codeGen.onBoolean(ctx.BOOLEAN().getText().equals("true"));
     }
 
     // complex literals
