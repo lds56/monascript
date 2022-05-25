@@ -50,6 +50,10 @@ public class ByteCodeMetadata {
     }
 
     public Integer getConstIndex(MonaObject obj) {
+        int idx = constValues.indexOf(obj);
+        if (idx != -1) {
+            return idx;
+        }
         constValues.add(obj);
         return constValues.size() - 1;
     }
