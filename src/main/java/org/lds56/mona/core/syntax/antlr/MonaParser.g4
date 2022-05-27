@@ -31,7 +31,7 @@ complex_stat
     ;
 
 declaration
-    : LET ID ASSIGN expr SEMI_COLON  # varAssStat
+    : LET ids ASSIGN expr SEMI_COLON  # varAssStat
     | LET ID ASSIGN anonymous_func # funcAssStat
     ;
 
@@ -61,9 +61,10 @@ expr
     ;
 
 value_expr
-    : value_expr LBRACKET value_expr RBRACKET    # memberIndex
-    | value_expr DOT ID                    # memberDot
-    | value_expr arguments                 # funcCallExpr
+    : value_expr LBRACKET value_expr RBRACKET       # indexExpr
+    | value_expr DOT ID                             # propertyExpr
+    | value_expr DOT ID arguments                   # memberCallExpr
+    | value_expr arguments                          # funcCallExpr
     // | ID COLON ID arguments   # namespaceFuncExpr
 
     | value_expr op=(MUL | DIV | MOD) value_expr              # multExpr
@@ -86,7 +87,7 @@ value_expr
     ;
 
 literal
-    :   NIL        # nilLiteral
+    :   NIL         # nilLiteral
     |   BOOLEAN     # booleanLiteral
     |   STRING      # stringLiteral
     // |   templateString
@@ -120,6 +121,10 @@ mapEntry
 
 identity
     : ID
+    ;
+
+ids
+    : ID (COMMA ID)*
     ;
 
 eos

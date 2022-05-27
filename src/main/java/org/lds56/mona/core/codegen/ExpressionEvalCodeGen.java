@@ -98,7 +98,7 @@ public class ExpressionEvalCodeGen implements AbastractCodeGen<MonaObject> {
     }
 
     @Override
-    public MonaObject onDot(MonaObject obj, String attr) {
+    public MonaObject onProperty(MonaObject obj, String attr) {
         return null;
     }
 
@@ -223,6 +223,11 @@ public class ExpressionEvalCodeGen implements AbastractCodeGen<MonaObject> {
     }
 
     @Override
+    public MonaObject onDestructuring(List<String> names, MonaObject value) {
+        return null;
+    }
+
+    @Override
     public MonaObject onParameters(List<String> argNames) {
         return null;
     }
@@ -240,6 +245,11 @@ public class ExpressionEvalCodeGen implements AbastractCodeGen<MonaObject> {
     @Override
     public MonaObject onArguments(List<MonaObject> argValues) {
         return MonaTuple.fromList(argValues);
+    }
+
+    @Override
+    public MonaObject onMemberCall(MonaObject obj, String memberName, List<MonaObject> args) {
+        return null;
     }
 
     @Override

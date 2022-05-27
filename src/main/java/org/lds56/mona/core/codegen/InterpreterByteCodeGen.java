@@ -183,14 +183,17 @@ public class InterpreterByteCodeGen implements AbastractCodeGen<ByteCodeBlock> {
     @Override
     public ByteCodeBlock onIndex(ByteCodeBlock obj, ByteCodeBlock index) {
         return ByteCodeBlock.build()
-                .append(obj)
-                .append(index)
-                .append(InstructionExt.of(OpCode.INDEX_ACCESS));
+                            .append(obj)
+                            .append(index)
+                            .append(InstructionExt.of(OpCode.INDEX_ACCESS));
     }
 
     @Override
-    public ByteCodeBlock onDot(ByteCodeBlock obj, String attr) {
-        return null;
+    public ByteCodeBlock onProperty(ByteCodeBlock obj, String attr) {
+        return ByteCodeBlock.build()
+                            .append(obj)
+                            .append(InstructionExt.of(OpCode.LOAD_CONSTANT, metaStack.peek().getConstIndex(MonaString.valueOf(attr))))
+                            .append(InstructionExt.of(OpCode.PROP_ACCESS));
     }
 
     @Override
@@ -372,6 +375,12 @@ public class InterpreterByteCodeGen implements AbastractCodeGen<ByteCodeBlock> {
     }
 
     @Override
+    public ByteCodeBlock onDestructuring(List<String> names, ByteCodeBlock value) {
+        // TODO: descturing assignment let a, b = pair;
+        return null;
+    }
+
+    @Override
     public ByteCodeBlock onParameters(List<String> argNames) {
         return null;
     }
@@ -394,6 +403,16 @@ public class InterpreterByteCodeGen implements AbastractCodeGen<ByteCodeBlock> {
     public ByteCodeBlock onArguments(List<ByteCodeBlock> argValues) {
         return ByteCodeBlock.build().append(argValues);
     }
+
+    @Override
+    public ByteCodeBlock onMemberCall(ByteCodeBlock obj, String memberName, List<ByteCodeBlock> args) {
+        return ByteCodeBlock.build()
+                .append(obj)
+                .append(InstructionExt.of(OpCode.LOAD_CONSTANT, metaStack.peek().getConstIndex(MonaString.valueOf(memberName))))
+                .append(args)
+                .append(InstructionExt.of(OpCode.CALL_METHOD, args.size()));
+    }
+
     @Override
     public ByteCodeBlock onFuncCall(ByteCodeBlock func, List<ByteCodeBlock> args) {
         return ByteCodeBlock.build()

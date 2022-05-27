@@ -37,7 +37,7 @@ public interface AbastractCodeGen<T> {
 
     T onIndex(T obj, T index);
 
-    T onDot(T obj, String attr);
+    T onProperty(T obj, String attr);
 
     T onAdd(T lhs, T rhs);
 
@@ -87,6 +87,8 @@ public interface AbastractCodeGen<T> {
 
     T onAssignment(String name, T value);
 
+    T onDestructuring(List<String> names, T value);
+
     T onParameters(List<String> argNames);
 
     T onFuncArgs(List<String> argNames);
@@ -94,6 +96,8 @@ public interface AbastractCodeGen<T> {
     T onFunction(List<String> argNames, T funcBody);
 
     T onArguments(List<T> argValues);
+
+    T onMemberCall(T obj, String memberName, List<T> args);
 
     T onFuncCall(T func, List<T> args);
 

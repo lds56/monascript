@@ -76,13 +76,13 @@ public class ASTParserVisitor<T> extends MonaParserBaseVisitor<T> {
     }
 
     @Override
-    public T visitMemberIndex(MemberIndexContext ctx) {
+    public T visitIndexExpr(IndexExprContext ctx) {
         return codeGen.onIndex(visit(ctx.value_expr(0)), visit(ctx.value_expr(1)));
     }
 
     @Override
-    public T visitMemberDot(MemberDotContext ctx) {
-        return codeGen.onDot(visit(ctx.value_expr()), ctx.ID().getText());
+    public T visitPropertyExpr(PropertyExprContext ctx) {
+        return codeGen.onProperty(visit(ctx.value_expr()), ctx.ID().getText());
     }
 
     // arithmetics
@@ -193,6 +193,11 @@ public class ASTParserVisitor<T> extends MonaParserBaseVisitor<T> {
     }
 
     @Override
+    public T visitMemberCallExpr(MemberCallExprContext ctx) {
+        return codeGen.onMemberCall(visit(ctx.value_expr()), ctx.ID().getText(), ctx.arguments().expr().stream().map(this::visit).collect(Collectors.toList()));
+    }
+
+    @Override
     public T visitFuncCallExpr(FuncCallExprContext ctx) {
         return codeGen.onFuncCall(visit(ctx.value_expr()), ctx.arguments().expr().stream().map(this::visit).collect(Collectors.toList()));
     }
@@ -207,7 +212,12 @@ public class ASTParserVisitor<T> extends MonaParserBaseVisitor<T> {
     // decl & assignment
     @Override
     public T visitVarAssStat(VarAssStatContext ctx) {  // TODO: change the name `VariableStatContext`
-        return codeGen.onDefinition(ctx.ID().getText(), visit(ctx.expr()));
+        if (ctx.ids().ID().size() == 1) {
+            return codeGen.onDefinition(ctx.ids().ID(0).getText(), visit(ctx.expr()));
+        }
+        else {
+            return codeGen.onDestructuring(ctx.ids().ID().stream().map(ParseTree::getText).collect(Collectors.toList()), visit(ctx.expr()));
+        }
     }
 
     @Override
