@@ -12,10 +12,10 @@ import org.lds56.mona.engine.MonaEngine;
  */
 public class ArithmeticTest {
 
+    MonaEngine engine = new MonaEngine();
+
     @Test
     public void testAdd() {
-
-        MonaEngine engine = new MonaEngine();
 
         String expr = "1+1";
         Object result = engine.execute(expr);
@@ -25,8 +25,6 @@ public class ArithmeticTest {
 
     @Test
     public void testExpr() {
-
-        MonaEngine engine = new MonaEngine();
 
         String expr = "(a+b*c/d-1>3)? a+b : a-b";
         Object result = engine.execute(expr, TestUtils.inputOf("a", 1, "b", 2, "c", 3, "d", 4));
