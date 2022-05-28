@@ -62,8 +62,8 @@ expr
 
 value_expr
     : value_expr LBRACKET value_expr RBRACKET       # indexExpr
-    | value_expr DOT ID                             # propertyExpr
     | value_expr DOT ID arguments                   # memberCallExpr
+    | value_expr DOT ID                             # propertyExpr
     | value_expr arguments                          # funcCallExpr
     // | ID COLON ID arguments   # namespaceFuncExpr
 

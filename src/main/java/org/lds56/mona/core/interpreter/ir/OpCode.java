@@ -125,7 +125,7 @@ public enum OpCode {
 
     CALL_FUNCTION_VARARG("VCALLF"),
 
-    CALL_METHOD("CALLM"),
+    CALL_METHOD("CALLM", OpLogic::CallMethod),
 
     CALL_METHOD_VARARG("VCALLM"),
 
@@ -138,6 +138,8 @@ public enum OpCode {
 
     // Index Operations
     INDEX_ACCESS("INDEX", OpLogic::IndexAccess),
+
+    PROP_ACCESS("PROP", OpLogic::PropAccess),
 
     // Make Operations
     MAKE_FUNCTION("MAKEF", OpLogic::MakeFunction),

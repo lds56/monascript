@@ -94,4 +94,15 @@ public class Context {
         }
         return args;
     }
+
+    public Object[] popArgsUnpacked(int argNum) {
+        // rightmost is top
+        // push args from left to right
+        // pop args from right to left
+        Object[] args = new Object[argNum];
+        for (int i=0; i<argNum; i++) {
+            args[argNum - i - 1] = _frame.popOperand().getValue();
+        }
+        return args;
+    }
 }

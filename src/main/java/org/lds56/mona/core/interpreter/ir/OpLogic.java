@@ -3,11 +3,8 @@ package org.lds56.mona.core.interpreter.ir;
 import org.lds56.mona.core.interpreter.Context;
 import org.lds56.mona.core.interpreter.MonaBB;
 import org.lds56.mona.core.runtime.MonaCalculator;
-import org.lds56.mona.core.runtime.traits.MonaTrait;
-import org.lds56.mona.core.runtime.traits.MonaIndexable;
 import org.lds56.mona.core.runtime.collections.MonaIter;
-import org.lds56.mona.core.runtime.traits.MonaIterable;
-import org.lds56.mona.core.runtime.traits.MonaInvocable;
+import org.lds56.mona.core.runtime.traits.*;
 import org.lds56.mona.core.runtime.types.MonaBoolean;
 import org.lds56.mona.core.runtime.types.MonaObject;
 
@@ -197,7 +194,7 @@ public class OpLogic {
     }
 
     public static Signal GetIterator(Context context, Integer unused) {
-        MonaIterable coll = MonaTrait.cast2iterable(context.frame().popOperand());
+        MonaIterable coll = MonaTrait.cast(context.frame().popOperand(), MonaIterable.class);
         context.frame().pushOperand(coll.iter());
         return Signal.emitNext();
     }
@@ -218,8 +215,15 @@ public class OpLogic {
 
     public static Signal IndexAccess(Context context, Integer unused) {
         MonaObject index = context.frame().popOperand();
-        MonaIndexable indexable = MonaTrait.cast2indexable(context.frame().popOperand());
+        MonaIndexable indexable = MonaTrait.cast(context.frame().popOperand(), MonaIndexable.class);
         context.frame().pushOperand(indexable.index(index));
+        return Signal.emitNext();
+    }
+
+    public static Signal PropAccess(Context context, Integer unused) {
+        MonaObject prop = context.frame().popOperand();
+        MonaAccessible obj = MonaTrait.cast(context.frame().popOperand(), MonaAccessible.class);
+        context.frame().pushOperand(obj.getProperty(prop.stringValue()));
         return Signal.emitNext();
     }
 
@@ -285,9 +289,17 @@ public class OpLogic {
         return Signal.emitCall(func, args);
     }
 
+    public static Signal CallMethod(Context context, Integer argNum) {
+        Object[] args = context.popArgsUnpacked(argNum);
+        MonaObject methodName = context.frame().popOperand();
+        MonaAccessible obj = MonaTrait.cast(context.frame().popOperand(), MonaAccessible.class);
+        context.frame().pushOperand(obj.callMethod(methodName.stringValue(), args));
+        return Signal.emitNext();
+    }
+
     public static Signal CallObject(Context context, Integer argNum) {
         MonaObject[] args = context.popArgs(argNum);
-        MonaInvocable func = MonaTrait.cast2invocable(context.frame().popOperand());
+        MonaInvocable func = MonaTrait.cast(context.frame().popOperand(), MonaInvocable.class);
         context.frame().pushOperand(func.invoke(args));
         return Signal.emitNext();
     }

@@ -1,11 +1,18 @@
 package org.lds56.mona.core.runtime.types;
 
+import org.apache.commons.beanutils.PropertyUtils;
+import org.lds56.mona.core.exception.ContextAccessException;
+import org.lds56.mona.core.exception.FunctionNotFoundException;
+import org.lds56.mona.core.exception.InvokeErrorException;
+import org.lds56.mona.core.runtime.traits.MonaAccessible;
 import org.lds56.mona.core.runtime.traits.MonaHashable;
+import org.lds56.mona.utils.NeoMethodUtils;
 
+import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-public class MonaJavaType extends MonaObject implements MonaHashable {
+public class MonaJavaType extends MonaObject implements MonaHashable, MonaAccessible {
 
     // original value
     protected final Object value;
@@ -111,7 +118,8 @@ public class MonaJavaType extends MonaObject implements MonaHashable {
     public BigDecimal bigDecValue() {
         return getNValue().bigDecValue();
     }
-//
+
+    // TODO: support java collection
 //    /**
 //     * Access array or list element
 //     *
@@ -195,4 +203,29 @@ public class MonaJavaType extends MonaObject implements MonaHashable {
     public int hash() {
         return value.hashCode();
     }
+
+    @Override
+    public MonaObject getProperty(String propName) {
+        try {
+            return wrap(PropertyUtils.getProperty(this.getValue(), propName));
+        } catch (NoSuchMethodException e) {
+            return MonaUndefined.UNDEF;
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            throw new ContextAccessException("No such a property: " + propName, e);
+        }
+    }
+
+    @Override
+    public MonaObject callMethod(String methodName, Object... args) {
+        try {
+            return wrap(NeoMethodUtils.getMethod(this.getValue().getClass(), methodName, args).invoke(this.getValue(), args));
+        } catch (FunctionNotFoundException e) {
+            return MonaUndefined.UNDEF;
+        } catch (IllegalAccessException | NoSuchMethodException e) {
+            throw new ContextAccessException("No such a method: " + methodName, e);
+        } catch (InvocationTargetException e) {
+            throw new InvokeErrorException("Invoke method error", e);
+        }
+    }
+
 }
