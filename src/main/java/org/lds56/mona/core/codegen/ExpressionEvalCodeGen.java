@@ -2,6 +2,8 @@ package org.lds56.mona.core.codegen;
 
 import org.lds56.mona.core.exception.SyntaxNotSupportedException;
 import org.lds56.mona.core.runtime.MonaCalculator;
+import org.lds56.mona.core.runtime.traits.MonaIndexable;
+import org.lds56.mona.core.runtime.traits.MonaInvocable;
 import org.lds56.mona.core.runtime.traits.MonaTrait;
 import org.lds56.mona.core.runtime.collections.MonaDict;
 import org.lds56.mona.core.runtime.collections.MonaList;
@@ -94,7 +96,7 @@ public class ExpressionEvalCodeGen implements AbastractCodeGen<MonaObject> {
 
     @Override
     public MonaObject onIndex(MonaObject obj, MonaObject index) {
-        return MonaTrait.cast2indexable(obj).index(index);
+        return MonaTrait.cast(obj, MonaIndexable.class).index(index);
     }
 
     @Override
@@ -255,7 +257,7 @@ public class ExpressionEvalCodeGen implements AbastractCodeGen<MonaObject> {
     @Override
     public MonaObject onFuncCall(MonaObject func, List<MonaObject> args) {
         MonaObject[] argArr = new MonaObject[args.size()];
-        return MonaTrait.cast2invocable(func).invoke(args.toArray(argArr));
+        return MonaTrait.cast(func, MonaInvocable.class).invoke(args.toArray(argArr));
     }
 
     @Override

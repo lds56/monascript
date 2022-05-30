@@ -4,15 +4,22 @@ import org.apache.commons.beanutils.PropertyUtils;
 import org.lds56.mona.core.exception.ContextAccessException;
 import org.lds56.mona.core.exception.FunctionNotFoundException;
 import org.lds56.mona.core.exception.InvokeErrorException;
+import org.lds56.mona.core.runtime.collections.MonaCollIter;
+import org.lds56.mona.core.runtime.collections.MonaCollType;
+import org.lds56.mona.core.runtime.collections.MonaIter;
 import org.lds56.mona.core.runtime.traits.MonaAccessible;
 import org.lds56.mona.core.runtime.traits.MonaHashable;
+import org.lds56.mona.core.runtime.traits.MonaIterable;
 import org.lds56.mona.utils.NeoMethodUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Objects;
 
-public class MonaJavaType extends MonaObject implements MonaHashable, MonaAccessible {
+public class MonaJavaType extends MonaObject implements MonaHashable, MonaAccessible, MonaIterable {
 
     // original value
     protected final Object value;
@@ -228,4 +235,32 @@ public class MonaJavaType extends MonaObject implements MonaHashable, MonaAccess
         }
     }
 
+    @Override
+    public Iterator<?> iterator() {
+        if (Objects.isNull(value)) {
+            throw new ContextAccessException("Cannot get an iterator from null value");
+        }
+
+        if (value.getClass().isArray()) {
+            // TODO: use tuple iterator()
+            // return Arrays.asList((Object[])value).iterator();
+            return null;
+        }
+        else if (value instanceof Collection) {
+            return ((Collection) value).iterator();
+        }
+        else {
+            throw new ContextAccessException("No iterable object");
+        }
+    }
+
+    @Override
+    public MonaIter iter() {
+        return new MonaCollIter(iterator());
+    }
+
+    @Override
+    public MonaCollType getCollType() {
+        return null;
+    }
 }
