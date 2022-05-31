@@ -3,23 +3,24 @@ package org.lds56.mona.core.runtime.types;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.lds56.mona.core.exception.ContextAccessException;
 import org.lds56.mona.core.exception.FunctionNotFoundException;
+import org.lds56.mona.core.exception.InvalidArgumentException;
 import org.lds56.mona.core.exception.InvokeErrorException;
 import org.lds56.mona.core.runtime.collections.MonaCollIter;
 import org.lds56.mona.core.runtime.collections.MonaCollType;
 import org.lds56.mona.core.runtime.collections.MonaIter;
 import org.lds56.mona.core.runtime.traits.MonaAccessible;
 import org.lds56.mona.core.runtime.traits.MonaHashable;
+import org.lds56.mona.core.runtime.traits.MonaIndexable;
 import org.lds56.mona.core.runtime.traits.MonaIterable;
 import org.lds56.mona.utils.NeoMethodUtils;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Objects;
+import java.util.*;
 
-public class MonaJavaType extends MonaObject implements MonaHashable, MonaAccessible, MonaIterable {
+public class MonaJavaType extends MonaObject implements MonaHashable, MonaAccessible, MonaIterable, MonaIndexable {
 
     // original value
     protected final Object value;
@@ -262,5 +263,49 @@ public class MonaJavaType extends MonaObject implements MonaHashable, MonaAccess
     @Override
     public MonaCollType getCollType() {
         return null;
+    }
+
+    @Override
+    public MonaObject index(MonaObject index) {
+
+        final Object thisValue = getValue();
+        final Object indexValue = index.getValue();
+
+        if (Objects.isNull(thisValue)) {
+            throw new ContextAccessException("Cannot get element from null value");
+        }
+
+        if (Objects.isNull(indexValue)) {
+            throw new ContextAccessException("Cannot use null index in collection");
+        }
+
+        Class<?> clazz = thisValue.getClass();
+
+        Object result;
+        if (Map.class.isAssignableFrom(clazz)) {
+            result = ((Map) thisValue).get(indexValue);
+        }
+        else if (List.class.isAssignableFrom(clazz)) {
+            if (indexValue instanceof Number) {
+                result = ((List) thisValue).get(((Number) indexValue).intValue());
+            } else {
+                throw new InvalidArgumentException("Integer type expected when get element from list");
+            }
+        }
+        else if (Set.class.isAssignableFrom(clazz)) {
+            result = ((Set) thisValue).contains(indexValue)? indexValue : null;
+        }
+        else if (clazz.isArray()) {
+            if (indexValue instanceof Number) {
+                result = Array.get(thisValue, ((Number) indexValue).intValue());
+            } else {
+                throw new InvalidArgumentException("Integer type expected when get element from list");
+            }
+        }
+        else {
+            throw new ContextAccessException("Cannot get element from unsupported type, list or map expected");
+        }
+
+        return result != null ? MonaObject.wrap(result) : MonaNull.NIL;
     }
 }
