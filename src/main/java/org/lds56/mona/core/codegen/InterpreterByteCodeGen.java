@@ -135,7 +135,11 @@ public class InterpreterByteCodeGen implements AbastractCodeGen<ByteCodeBlock> {
 
     @Override
     public ByteCodeBlock onRange(int start, int end) {
-        return null;
+        return ByteCodeBlock.build()
+                            .append(InstructionExt.of(OpCode.LOAD_GLOBAL, findMetadataVar("coll.range").index))
+                            .append(onInteger(start))
+                            .append(onInteger(end))
+                            .append(InstructionExt.of(OpCode.CALL_OBJECT, 2));
     }
 
     @Override

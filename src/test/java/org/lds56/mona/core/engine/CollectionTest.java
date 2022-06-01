@@ -39,4 +39,26 @@ public class CollectionTest {
         Object o = engine.execute(s, TestUtils.inputOf("l", Arrays.asList(1, 2, 3, 4, 5)));
         Assertions.assertEquals(o, 2);
     }
+
+    @Test
+    public void testRangeFor() {
+        String s = "let sum = 0;" +
+                   "for x in 1..10 {" +
+                   "    sum = sum + x;" +
+                   "}" +
+                   "return sum;";
+        Object o = engine.execute(s);
+        Assertions.assertEquals(o, 45);
+    }
+
+    @Test
+    public void testClosedRangeFor() {
+        String s = "let sum = 0;" +
+                   "for x in 1...10 {" +
+                   "    sum = sum + x;" +
+                   "}" +
+                   "return sum;";
+        Object o = engine.execute(s);
+        Assertions.assertEquals(o, 55);
+    }
 }

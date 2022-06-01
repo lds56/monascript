@@ -69,6 +69,12 @@ public class ASTParserVisitor<T> extends MonaParserBaseVisitor<T> {
         return codeGen.onMap(ctx.mapEntry().stream().flatMap(e -> e.expr().stream().map(this::visit)).collect(Collectors.toList()));
     }
 
+    @Override
+    public T visitRangeLiteral(RangeLiteralContext ctx) {
+        return codeGen.onRange(Integer.parseInt(ctx.INTEGER(0).getText()),
+                               Integer.parseInt(ctx.INTEGER(1).getText()) + (ctx.DOOT() != null? 0 : 1));
+    }
+
     // access
     @Override
     public T visitIdentifierExpr(IdentifierExprContext ctx) {
