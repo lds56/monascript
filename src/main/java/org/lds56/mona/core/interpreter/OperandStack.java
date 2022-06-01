@@ -3,7 +3,7 @@ package org.lds56.mona.core.interpreter;
 import java.util.EmptyStackException;
 import java.util.Vector;
 
-// TODO: may be use array？
+@Deprecated
 public class OperandStack<T> extends Vector<T> {
 
     OperandStack() {}
