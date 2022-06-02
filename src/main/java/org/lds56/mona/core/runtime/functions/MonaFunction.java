@@ -72,4 +72,10 @@ public class MonaFunction extends MonaObject implements MonaInvocable {
         throw new InvokeErrorException("Inner function not found");
 
     }
+
+
+    @Override
+    public String toString() {
+        return "Func[" + innerFunc.getPackage() + ":" + innerFunc.getName() + "]";
+    }
 }

@@ -31,8 +31,8 @@ complex_stat
     ;
 
 declaration
-    : LET ids ASSIGN expr SEMI_COLON  # varAssStat
-    | LET ID ASSIGN anonymous_func # funcAssStat
+    : LET ids ASSIGN expr SEMI_COLON        # varAssStat
+    | LET ID ASSIGN anonymous_func          # funcAssStat
     ;
 
 arguments
@@ -44,8 +44,8 @@ parameters
     ;
 
 block
-    : LBRACE stat* RBRACE           # statBlock
-    | LBRACE expr RBRACE             # exprBlock
+    : LBRACE stat* RBRACE                   # statBlock
+    | LBRACE expr RBRACE                    # exprBlock
     ;
 
 anonymous_func
@@ -62,28 +62,28 @@ expr
 
 value_expr
     : value_expr LBRACKET value_expr RBRACKET       # indexExpr
-    | value_expr DOT ID arguments                   # memberCallExpr
+    | value_expr DOT ID arguments                   # methodExpr
     | value_expr DOT ID                             # propertyExpr
     | value_expr arguments                          # funcCallExpr
     // | ID COLON ID arguments   # namespaceFuncExpr
 
-    | value_expr op=(MUL | DIV | MOD) value_expr              # multExpr
-    | value_expr op=(ADD | SUB) value_expr                  # addExpr
-    | value_expr op=(SHR | SHL) value_expr          # bitShiftExpr
-    | value_expr op=(UNSIGNED_SHR | UNSIGNED_SHL) value_expr          # unsignedBitShiftExpr
-    | value_expr op=(LT | LTE | GT | GTE) value_expr        # compareExpr
-    | value_expr op=(EQ | NEQ) value_expr    # equalExpr
-    | value_expr op=(BIT_AND | BIT_OR | BIT_XOR) value_expr           # bitLogicalExpr
-    | value_expr op=(AND | OR) value_expr          # logicalExpr
+    | value_expr op=(MUL | DIV | MOD) value_expr                # multExpr
+    | value_expr op=(ADD | SUB) value_expr                      # addExpr
+    | value_expr op=(SHR | SHL) value_expr                      # bitShiftExpr
+    | value_expr op=(UNSIGNED_SHR | UNSIGNED_SHL) value_expr    # unsignedBitShiftExpr
+    | value_expr op=(LT | LTE | GT | GTE) value_expr            # compareExpr
+    | value_expr op=(EQ | NEQ) value_expr                       # equalExpr
+    | value_expr op=(BIT_AND | BIT_OR | BIT_XOR) value_expr     # bitLogicalExpr
+    | value_expr op=(AND | OR) value_expr                       # logicalExpr
 
-    | op=(ADD | SUB) value_expr        # minusPlusExpr
+    | op=(ADD | SUB) value_expr         # minusPlusExpr
     | BIT_NOT value_expr                # bitNotExpr
-    | NOT value_expr                # logicalNotExpr
+    | NOT value_expr                    # logicalNotExpr
 
-    | anonymous_func          # lambdaExpr
-    | identity                # identifierExpr
-    | literal                 # literalExpr
-    | LPAREN value_expr RPAREN      # parenExpr
+    | anonymous_func                    # lambdaExpr
+    | identity                          # identifierExpr
+    | literal                           # literalExpr
+    | LPAREN value_expr RPAREN          # parenExpr
     ;
 
 literal
@@ -106,7 +106,7 @@ collLiteral
     :   LBRACKET ( expr (COMMA expr)* )? RBRACKET                  # listLiteral
     |   LBRACE   ( expr (COMMA expr)* )? RBRACE                    # setLiteral
     |   LBRACE   ((mapEntry (COMMA mapEntry)*) | COLON ) RBRACE    # mapLiteral
-    |   INTEGER   (DOOT | DOOOT) INTEGER                                     # rangeLiteral
+    |   INTEGER   (DOOT | DOOOT) INTEGER                           # rangeLiteral
     ;
 
 mapEntry

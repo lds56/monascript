@@ -1,11 +1,12 @@
 package org.lds56.mona.core.syntax.ast;
 
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.lds56.mona.core.codegen.AbastractCodeGen;
 import org.lds56.mona.core.exception.SyntaxNotSupportedException;
-import org.antlr.v4.runtime.tree.ParseTree;
 import org.lds56.mona.core.syntax.antlr.MonaParser.*;
 import org.lds56.mona.core.syntax.antlr.MonaParserBaseVisitor;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -199,7 +200,7 @@ public class ASTParserVisitor<T> extends MonaParserBaseVisitor<T> {
     }
 
     @Override
-    public T visitMemberCallExpr(MemberCallExprContext ctx) {
+    public T visitMethodExpr(MethodExprContext ctx) {
         return codeGen.onMemberCall(visit(ctx.value_expr()), ctx.ID().getText(), ctx.arguments().expr().stream().map(this::visit).collect(Collectors.toList()));
     }
 
@@ -213,6 +214,14 @@ public class ASTParserVisitor<T> extends MonaParserBaseVisitor<T> {
         List<String> paramList = ctx.parameters().ID().stream().map(ParseTree::getText).collect(Collectors.toList());
         codeGen.onFuncArgs(paramList);
         return codeGen.onFunction(paramList, visit(ctx.block()));
+    }
+
+    @Override
+    public T visitLambda(LambdaContext ctx) {
+        List<String> paramList = ctx.ID() != null?  Arrays.asList(ctx.ID().getText()) :
+             ctx.parameters().ID().stream().map(ParseTree::getText).collect(Collectors.toList());
+        codeGen.onFuncArgs(paramList);
+        return codeGen.onFunction(paramList, ctx.block() != null? visit(ctx.block()) : visit(ctx.expr()));
     }
 
     // decl & assignment
