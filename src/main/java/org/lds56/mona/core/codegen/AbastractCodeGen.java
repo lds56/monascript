@@ -82,6 +82,16 @@ public interface AbastractCodeGen<T> {
     T onBitNot(T value);
 
     T onTernary(T cond, T lvalue, T rvalue);
+    
+    T onSelfAdd(String name, T value);
+
+    T onSelfSub(String name, T value);
+
+    T onSelfMul(String name, T value);
+
+    T onSelfDiv(String name, T value);
+
+    T onSelfMod(String name, T value);
 
     T onDefinition(String name, T value);
 

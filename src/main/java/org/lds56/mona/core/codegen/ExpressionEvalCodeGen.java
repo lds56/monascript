@@ -215,6 +215,31 @@ public class ExpressionEvalCodeGen implements AbastractCodeGen<MonaObject> {
     }
 
     @Override
+    public MonaObject onSelfAdd(String name, MonaObject value) {
+        return null;
+    }
+
+    @Override
+    public MonaObject onSelfSub(String name, MonaObject value) {
+        return null;
+    }
+
+    @Override
+    public MonaObject onSelfMul(String name, MonaObject value) {
+        return null;
+    }
+
+    @Override
+    public MonaObject onSelfDiv(String name, MonaObject value) {
+        return null;
+    }
+
+    @Override
+    public MonaObject onSelfMod(String name, MonaObject value) {
+        return null;
+    }
+
+    @Override
     public MonaObject onDefinition(String name, MonaObject value) {
         return null;
     }

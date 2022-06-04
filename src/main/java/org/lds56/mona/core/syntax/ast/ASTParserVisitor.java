@@ -245,6 +245,24 @@ public class ASTParserVisitor<T> extends MonaParserBaseVisitor<T> {
         return codeGen.onAssignment(ctx.ID().getText(), visit(ctx.value_expr()));
     }
 
+    @Override
+    public T visitSelfAssignmentExpr(SelfAssignmentExprContext ctx) {
+        switch (ctx.op.getText()) {
+            case "+=":
+                return codeGen.onSelfAdd(ctx.ID().getText(), visit(ctx.value_expr()));
+            case "-=":
+                return codeGen.onSelfSub(ctx.ID().getText(), visit(ctx.value_expr()));
+            case "*=":
+                return codeGen.onSelfMul(ctx.ID().getText(), visit(ctx.value_expr()));
+            case "/=":
+                return codeGen.onSelfDiv(ctx.ID().getText(), visit(ctx.value_expr()));
+            case "%=":
+                return codeGen.onSelfMod(ctx.ID().getText(), visit(ctx.value_expr()));
+            default:
+                throw new SyntaxNotSupportedException("Unspported self manipulation");
+        }
+    }
+
     // expressions & statements
     @Override
     public T visitExpression(ExpressionContext ctx) {
