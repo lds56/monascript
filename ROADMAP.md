@@ -1,0 +1,19 @@
+# ROADMAP
+- [x] Intermediate Representation Design
+- [x] IR Code Generator
+- [ ] IR Code Optimizer
+- [x] MonaVM: a Virtual Machine running Mona IR
+- [ ] Features
+  - [x] Arithmetic
+  - [x] Ternary
+  - [x] Variables
+  - [x] Function Call
+  - [x] Condition Statement
+  - [x] Loop Statement
+  - [x] Lambda & Closure
+  - [ ] Safe ? mark
+- [ ] Optimization
+  - [ ] Compilation (MonaScript -> MonaIR)
+  - [ ] Runtime
+- [ ] Implemented by other PL
+- [ ] Bootstrapping!!!
