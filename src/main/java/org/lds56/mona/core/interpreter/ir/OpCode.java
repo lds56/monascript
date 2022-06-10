@@ -68,6 +68,7 @@ public enum OpCode {
 
     INPLACE_ADD("INADD", OpLogic::InplaceAdd),
 
+    // TODO: implement inplace
     INPLACE_SUBSTRACT("INSUB"),
 
     INPLACE_MULTIPLY("INMUL"),

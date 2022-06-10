@@ -14,43 +14,43 @@ public class OpLogic {
 
     // Stack
     public static Signal PopTop(Context context, Integer unused) {
-        context.frame().popOperand();
+        context.popOperand();
         return Signal.emitNext();
     }
 
     // Arithmetic
     public static Signal Add(Context context, Integer unused) {
-        MonaObject rhs = context.frame().popOperand();
-        MonaObject lhs = context.frame().popOperand();
-        context.frame().pushOperand(MonaCalculator.add(lhs, rhs));
+        MonaObject rhs = context.popOperand();
+        MonaObject lhs = context.popOperand();
+        context.pushOperand(MonaCalculator.add(lhs, rhs));
         return Signal.emitNext();
     }
 
     public static Signal Substract(Context context, Integer unused) {
-        MonaObject rhs = context.frame().popOperand();
-        MonaObject lhs = context.frame().popOperand();
-        context.frame().pushOperand(MonaCalculator.sub(lhs, rhs));
+        MonaObject rhs = context.popOperand();
+        MonaObject lhs = context.popOperand();
+        context.pushOperand(MonaCalculator.sub(lhs, rhs));
         return Signal.emitNext();
     }
 
     public static Signal Multiply(Context context, Integer unused) {
-        MonaObject rhs = context.frame().popOperand();
-        MonaObject lhs = context.frame().popOperand();
-        context.frame().pushOperand(MonaCalculator.mult(lhs, rhs));
+        MonaObject rhs = context.popOperand();
+        MonaObject lhs = context.popOperand();
+        context.pushOperand(MonaCalculator.mult(lhs, rhs));
         return Signal.emitNext();
     }
 
     public static Signal Divide(Context context, Integer unused) {
-        MonaObject rhs = context.frame().popOperand();
-        MonaObject lhs = context.frame().popOperand();
-        context.frame().pushOperand(MonaCalculator.div(lhs, rhs));
+        MonaObject rhs = context.popOperand();
+        MonaObject lhs = context.popOperand();
+        context.pushOperand(MonaCalculator.div(lhs, rhs));
         return Signal.emitNext();
     }
 
     public static Signal Modulo(Context context, Integer unused) {
-        MonaObject rhs = context.frame().popOperand();
-        MonaObject lhs = context.frame().popOperand();
-        context.frame().pushOperand(MonaCalculator.mod(lhs, rhs));
+        MonaObject rhs = context.popOperand();
+        MonaObject lhs = context.popOperand();
+        context.pushOperand(MonaCalculator.mod(lhs, rhs));
         return Signal.emitNext();
     }
 
@@ -59,171 +59,175 @@ public class OpLogic {
     }
 
     public static Signal Negative(Context context, Integer unused) {
-        context.frame().pushOperand(MonaCalculator.neg(context.frame().popOperand()));
+        context.pushOperand(MonaCalculator.neg(context.popOperand()));
         return Signal.emitNext();
     }
 
     // Logic
     public static Signal LogicAnd(Context context, Integer unused) {
-        MonaObject rhs = context.frame().popOperand();
-        MonaObject lhs = context.frame().popOperand();
-        context.frame().pushOperand(MonaCalculator.and(lhs, rhs));
+        MonaObject rhs = context.popOperand();
+        MonaObject lhs = context.popOperand();
+        context.pushOperand(MonaCalculator.and(lhs, rhs));
         return Signal.emitNext();
     }
 
     public static Signal LogicOr(Context context, Integer unused) {
-        MonaObject rhs = context.frame().popOperand();
-        MonaObject lhs = context.frame().popOperand();
-        context.frame().pushOperand(MonaCalculator.or(lhs, rhs));
+        MonaObject rhs = context.popOperand();
+        MonaObject lhs = context.popOperand();
+        context.pushOperand(MonaCalculator.or(lhs, rhs));
         return Signal.emitNext();
     }
 
     public static Signal LogicNot(Context context, Integer unused) {
-        context.frame().pushOperand(MonaCalculator.not(context.frame().popOperand()));
+        context.pushOperand(MonaCalculator.not(context.popOperand()));
         return Signal.emitNext();
     }
 
     // Bitwise
     public static Signal BitAnd(Context context, Integer unused) {
-        MonaObject rhs = context.frame().popOperand();
-        MonaObject lhs = context.frame().popOperand();
-        context.frame().pushOperand(MonaCalculator.bitAnd(lhs, rhs));
+        MonaObject rhs = context.popOperand();
+        MonaObject lhs = context.popOperand();
+        context.pushOperand(MonaCalculator.bitAnd(lhs, rhs));
         return Signal.emitNext();
     }
 
     public static Signal BitOr(Context context, Integer unused) {
-        MonaObject rhs = context.frame().popOperand();
-        MonaObject lhs = context.frame().popOperand();
-        context.frame().pushOperand(MonaCalculator.bitOr(lhs, rhs));
+        MonaObject rhs = context.popOperand();
+        MonaObject lhs = context.popOperand();
+        context.pushOperand(MonaCalculator.bitOr(lhs, rhs));
         return Signal.emitNext();
     }
 
     public static Signal BitXor(Context context, Integer unused) {
-        MonaObject rhs = context.frame().popOperand();
-        MonaObject lhs = context.frame().popOperand();
-        context.frame().pushOperand(MonaCalculator.bitXor(lhs, rhs));
+        MonaObject rhs = context.popOperand();
+        MonaObject lhs = context.popOperand();
+        context.pushOperand(MonaCalculator.bitXor(lhs, rhs));
         return Signal.emitNext();
     }
 
     public static Signal BitNot(Context context, Integer unused) {
-        context.frame().pushOperand(MonaCalculator.bitNot(context.frame().popOperand()));
+        context.pushOperand(MonaCalculator.bitNot(context.popOperand()));
         return Signal.emitNext();
     }
 
     // Inplace Arithmetic
-    // TODO: support inplace add
     public static Signal InplaceAdd(Context context, Integer unused) {
-        MonaObject rhs = context.frame().popOperand();
-        MonaObject lhs = context.frame().popOperand();
-        context.frame().pushOperand(MonaCalculator.add(lhs, rhs));
+        MonaObject rhs = context.popOperand();
+        context.topOperand(MonaCalculator.add(context.topOperand(), rhs));
+        return Signal.emitNext();
+    }
+
+    public static Signal InplaceSub(Context context, Integer unused) {
+        MonaObject rhs = context.popOperand();
+        context.topOperand(MonaCalculator.sub(context.topOperand(), rhs));
         return Signal.emitNext();
     }
 
     // Comparation
     public static Signal Equal(Context context, Integer unused) {
-        MonaObject rhs = context.frame().popOperand();
-        MonaObject lhs = context.frame().popOperand();
-        context.frame().pushOperand(MonaCalculator.eq(lhs, rhs));
+        MonaObject rhs = context.popOperand();
+        MonaObject lhs = context.popOperand();
+        context.pushOperand(MonaCalculator.eq(lhs, rhs));
         return Signal.emitNext();
     }
 
     public static Signal NotEqual(Context context, Integer unused) {
-        MonaObject rhs = context.frame().popOperand();
-        MonaObject lhs = context.frame().popOperand();
-        context.frame().pushOperand(MonaCalculator.neq(lhs, rhs));
+        MonaObject rhs = context.popOperand();
+        MonaObject lhs = context.popOperand();
+        context.pushOperand(MonaCalculator.neq(lhs, rhs));
         return Signal.emitNext();
     }
 
     public static Signal GreaterThan(Context context, Integer unused) {
-        MonaObject rhs = context.frame().popOperand();
-        MonaObject lhs = context.frame().popOperand();
-        context.frame().pushOperand(MonaCalculator.gt(lhs, rhs));
+        MonaObject rhs = context.popOperand();
+        MonaObject lhs = context.popOperand();
+        context.pushOperand(MonaCalculator.gt(lhs, rhs));
         return Signal.emitNext();
     }
 
     public static Signal LessThan(Context context, Integer unused) {
-        MonaObject rhs = context.frame().popOperand();
-        MonaObject lhs = context.frame().popOperand();
-        context.frame().pushOperand(MonaCalculator.lt(lhs, rhs));
+        MonaObject rhs = context.popOperand();
+        MonaObject lhs = context.popOperand();
+        context.pushOperand(MonaCalculator.lt(lhs, rhs));
         return Signal.emitNext();
     }
 
     public static Signal GreaterThanOrEqual(Context context, Integer unused) {
-        MonaObject rhs = context.frame().popOperand();
-        MonaObject lhs = context.frame().popOperand();
-        context.frame().pushOperand(MonaCalculator.gte(lhs, rhs));
+        MonaObject rhs = context.popOperand();
+        MonaObject lhs = context.popOperand();
+        context.pushOperand(MonaCalculator.gte(lhs, rhs));
         return Signal.emitNext();
     }
 
     public static Signal LessThanOrEqual(Context context, Integer unused) {
-        MonaObject rhs = context.frame().popOperand();
-        MonaObject lhs = context.frame().popOperand();
-        context.frame().pushOperand(MonaCalculator.lte(lhs, rhs));
+        MonaObject rhs = context.popOperand();
+        MonaObject lhs = context.popOperand();
+        context.pushOperand(MonaCalculator.lte(lhs, rhs));
         return Signal.emitNext();
     }
 
     // Data
     public static Signal LoadLocal(Context context, Integer index) {
         MonaObject value = context.frame().getLocal(index);
-        context.frame().pushOperand(value);
+        context.pushOperand(value);
         return Signal.emitNext();
     }
 
     public static Signal LoadGlobal(Context context, Integer index) {
         MonaObject value = context.findGlobal(index);
-        context.frame().pushOperand(value);
+        context.pushOperand(value);
         return Signal.emitNext();
     }
 
     public static Signal LoadConst(Context context, Integer index) {
         MonaObject value = context.block().loadConst(index);
-        context.frame().pushOperand(value);
+        context.pushOperand(value);
         return Signal.emitNext();
     }
 
     public static Signal StoreLocal(Context context, Integer index) {
-        MonaObject value = context.frame().popOperand();
+        MonaObject value = context.popOperand();
         context.frame().setLocal(index, value);
         return Signal.emitNext();
     }
 
     public static Signal StoreGlobal(Context context, Integer index) {
-        MonaObject value = context.frame().popOperand();
+        MonaObject value = context.popOperand();
         context.setGlobal(-index, value);
         return Signal.emitNext();
     }
 
     public static Signal GetIterator(Context context, Integer unused) {
-        MonaIterable coll = MonaTrait.cast(context.frame().popOperand(), MonaIterable.class);
-        context.frame().pushOperand(coll.iter());
+        MonaIterable coll = MonaTrait.cast(context.popOperand(), MonaIterable.class);
+        context.pushOperand(coll.iter());
         return Signal.emitNext();
     }
 
     // if has next, push next value & true, else only pop self and push false
     public static Signal NextIterator(Context context, Integer unused) {
         // no pop
-        MonaIter iter = (MonaIter) context.frame().topOperand();
+        MonaIter iter = (MonaIter) context.topOperand();
         if (iter.hasNext()) {
-            context.frame().pushOperand(iter.next());
-            context.frame().pushOperand(MonaBoolean.TRUE);
+            context.pushOperand(iter.next());
+            context.pushOperand(MonaBoolean.TRUE);
         }
         else {
-            context.frame().topOperand(MonaBoolean.FALSE);
+            context.topOperand(MonaBoolean.FALSE);
         }
         return Signal.emitNext();
     }
 
     public static Signal IndexAccess(Context context, Integer unused) {
-        MonaObject index = context.frame().popOperand();
-        MonaIndexable indexable = MonaTrait.cast(context.frame().popOperand(), MonaIndexable.class);
-        context.frame().pushOperand(indexable.index(index));
+        MonaObject index = context.popOperand();
+        MonaIndexable indexable = MonaTrait.cast(context.popOperand(), MonaIndexable.class);
+        context.pushOperand(indexable.index(index));
         return Signal.emitNext();
     }
 
     public static Signal PropAccess(Context context, Integer unused) {
-        MonaObject prop = context.frame().popOperand();
-        MonaAccessible obj = MonaTrait.cast(context.frame().popOperand(), MonaAccessible.class);
-        context.frame().pushOperand(obj.getProperty(prop.stringValue()));
+        MonaObject prop = context.popOperand();
+        MonaAccessible obj = MonaTrait.cast(context.popOperand(), MonaAccessible.class);
+        context.pushOperand(obj.getProperty(prop.stringValue()));
         return Signal.emitNext();
     }
 
@@ -240,7 +244,7 @@ public class OpLogic {
     }
 
     public static Signal BranchTrue(Context context, Integer index) {
-        if (context.frame().popOperand().booleanValue()) {
+        if (context.popOperand().booleanValue()) {
             return Signal.emitJump(context.block().startAddress() + index);
         } else {
             return Signal.emitNext();
@@ -248,7 +252,7 @@ public class OpLogic {
     }
 
     public static Signal BranchFalse(Context context, Integer index) {
-        if (!context.frame().popOperand().booleanValue()) {
+        if (!context.popOperand().booleanValue()) {
             return Signal.emitJump(context.block().startAddress() + index);
         } else {
             return Signal.emitNext();
@@ -280,52 +284,52 @@ public class OpLogic {
     }
 
     public static Signal ReturnValue(Context context, Integer unused) {
-        return Signal.emitRet(context.frame().popOperand());
+        return Signal.emitRet(context.popOperand());
     }
 
     public static Signal CallFunction(Context context, Integer argNum) {
         MonaObject[] args = context.popArgs(argNum);
-        MonaObject func = context.frame().popOperand();
+        MonaObject func = context.popOperand();
         return Signal.emitCall(func, args);
     }
 
     public static Signal CallMethod(Context context, Integer argNum) {
         Object[] args = context.popArgsUnpacked(argNum);
-        MonaObject methodName = context.frame().popOperand();
-        MonaAccessible obj = MonaTrait.cast(context.frame().popOperand(), MonaAccessible.class);
-        context.frame().pushOperand(obj.callMethod(methodName.stringValue(), args));
+        MonaObject methodName = context.popOperand();
+        MonaAccessible obj = MonaTrait.cast(context.popOperand(), MonaAccessible.class);
+        context.pushOperand(obj.callMethod(methodName.stringValue(), args));
         return Signal.emitNext();
     }
 
     public static Signal CallObject(Context context, Integer argNum) {
         MonaObject[] args = context.popArgs(argNum);
-        MonaInvocable func = MonaTrait.cast(context.frame().popOperand(), MonaInvocable.class);
-        context.frame().pushOperand(func.invoke(args));
+        MonaInvocable func = MonaTrait.cast(context.popOperand(), MonaInvocable.class);
+        context.pushOperand(func.invoke(args));
         return Signal.emitNext();
     }
 
     public static Signal MakeFunction(Context context, Integer flag) {
-        context.frame().pushOperand(new MonaBB(flag));      // TODO: change MonaBB
+        context.pushOperand(new MonaBB(flag));      // TODO: change MonaBB
         return Signal.emitNext();
     }
 
 //    private static Signal UnaryOpLogic(Context context, UnaryOperator<MonaObject> unaryOp) {
-//        MonaObject value = context.frame().popOperand();
-//        context.frame().pushOperand(unaryOp.apply(value));
+//        MonaObject value = context.popOperand();
+//        context.pushOperand(unaryOp.apply(value));
 //        return Signal.emitNext();
 //    }
 //
 //    private static Signal BinaryOpLogic(Context context, BinaryOperator<MonaObject> binaryOp) {
-//        MonaObject rhs = context.frame().popOperand();
-//        MonaObject lhs = context.frame().popOperand();
-//        context.frame().pushOperand(binaryOp.apply(lhs, rhs));
+//        MonaObject rhs = context.popOperand();
+//        MonaObject lhs = context.popOperand();
+//        context.pushOperand(binaryOp.apply(lhs, rhs));
 //        return Signal.emitNext();
 //    }
 
 
     private static Signal BranchBinaryOpLogic(Context context, Integer index, BinaryOperator<MonaObject> binaryOp) {
-        MonaObject rhs = context.frame().popOperand();
-        MonaObject lhs = context.frame().popOperand();
+        MonaObject rhs = context.popOperand();
+        MonaObject lhs = context.popOperand();
         if (binaryOp.apply(lhs, rhs).booleanValue()) {
             return Signal.emitJump(context.block().startAddress() + index);
         } else {

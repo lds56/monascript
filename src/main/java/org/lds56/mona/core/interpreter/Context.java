@@ -105,4 +105,21 @@ public class Context {
         }
         return args;
     }
+
+    // Operand Operation
+    public void pushOperand(MonaObject obj) {
+        this._frame.pushOperand(obj);
+    }
+
+    public MonaObject popOperand() {
+        return this._frame.popOperand();
+    }
+
+    public MonaObject topOperand() {
+        return this._frame.topOperand();
+    }
+
+    public void topOperand(MonaObject obj) {
+        this._frame.topOperand(obj);
+    }
 }
