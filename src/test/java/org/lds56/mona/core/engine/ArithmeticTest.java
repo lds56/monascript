@@ -3,16 +3,13 @@ package org.lds56.mona.core.engine;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.lds56.mona.core.util.TestUtils;
-import org.lds56.mona.engine.MonaEngine;
 
 /**
  * @Author: Rui Chen
  * @Date: 12 May 2022
  * @Description: This is description.
  */
-public class ArithmeticTest {
-
-    MonaEngine engine = new MonaEngine();
+public class ArithmeticTest extends ScriptTest {
 
     @Test
     public void testAdd() {

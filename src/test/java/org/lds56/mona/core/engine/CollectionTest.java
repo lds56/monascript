@@ -3,7 +3,6 @@ package org.lds56.mona.core.engine;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.lds56.mona.core.util.TestUtils;
-import org.lds56.mona.engine.MonaEngine;
 
 import java.util.Arrays;
 
@@ -12,9 +11,7 @@ import java.util.Arrays;
  * @Date: 30 May 2022
  * @Description: This is description.
  */
-public class CollectionTest {
-
-    MonaEngine engine = new MonaEngine();
+public class CollectionTest extends ScriptTest {
 
     @Test
     public void testListSize() {
