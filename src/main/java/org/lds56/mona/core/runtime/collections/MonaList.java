@@ -68,6 +68,11 @@ public class MonaList extends MonaObject implements MonaIterable, MonaIndexable 
     }
 
     @Override
+    public int len() {
+        return list.size();
+    }
+
+    @Override
     public String toString() {
         return "list" + list.toString();
     }

@@ -112,6 +112,11 @@ public class MonaDict extends MonaObject implements MonaIterable, MonaIndexable 
     }
 
     @Override
+    public int len() {
+        return dict.size();
+    }
+
+    @Override
     public String toString() {
         return "dict" + dict.values().toString();
     }

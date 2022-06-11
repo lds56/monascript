@@ -91,6 +91,11 @@ public class MonaTuple extends MonaObject implements MonaIterable, MonaIndexable
     }
 
     @Override
+    public int len() {
+        return value.length;
+    }
+
+    @Override
     public String toString() {
         return "tp" + Arrays.toString(value);
     }

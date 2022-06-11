@@ -10,4 +10,6 @@ import org.lds56.mona.core.runtime.types.MonaObject;
 public interface MonaIndexable {
 
     MonaObject index(MonaObject index);
+
+    int len();
 }

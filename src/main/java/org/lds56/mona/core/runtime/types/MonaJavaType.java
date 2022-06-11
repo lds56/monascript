@@ -308,4 +308,27 @@ public class MonaJavaType extends MonaObject implements MonaHashable, MonaAccess
 
         return result != null ? MonaObject.wrap(result) : MonaNull.NIL;
     }
+
+    @Override
+    public int len() {
+        final Object value = getValue();
+
+        if (Objects.isNull(value)) {
+            throw new ContextAccessException("Cannot get element from null value");
+        }
+
+        Class<?> clazz = value.getClass();
+        if (Map.class.isAssignableFrom(clazz)) {
+            return ((Map) value).size();
+        }
+        else if (Collection.class.isAssignableFrom(clazz)) {
+            return ((Collection) value).size();
+        }
+        else if (clazz.isArray()) {
+            return Array.getLength(value);
+        }
+        else {
+            throw new ContextAccessException("Cannot get length from unsupported type, list or map expected");
+        }
+    }
 }
