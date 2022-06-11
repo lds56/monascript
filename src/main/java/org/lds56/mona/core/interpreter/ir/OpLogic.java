@@ -123,6 +123,30 @@ public class OpLogic {
         return Signal.emitNext();
     }
 
+    public static Signal InplaceMult(Context context, Integer unused) {
+        MonaObject rhs = context.popOperand();
+        context.topOperand(MonaCalculator.mult(context.topOperand(), rhs));
+        return Signal.emitNext();
+    }
+
+    public static Signal InplaceDiv(Context context, Integer unused) {
+        MonaObject rhs = context.popOperand();
+        context.topOperand(MonaCalculator.mult(context.topOperand(), rhs));
+        return Signal.emitNext();
+    }
+
+    public static Signal InplaceMod(Context context, Integer unused) {
+        MonaObject rhs = context.popOperand();
+        context.topOperand(MonaCalculator.mod(context.topOperand(), rhs));
+        return Signal.emitNext();
+    }
+
+//    public static Signal InplacePow(Context context, Integer unused) {
+//        MonaObject rhs = context.popOperand();
+//        context.topOperand(MonaCalculator.add(context.topOperand(), rhs));
+//        return Signal.emitNext();
+//    }
+
     // Comparation
     public static Signal Equal(Context context, Integer unused) {
         MonaObject rhs = context.popOperand();

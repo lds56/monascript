@@ -364,6 +364,56 @@ public class InterpreterByteCodeGen implements AbastractCodeGen<ByteCodeBlock> {
     }
 
     @Override
+    public ByteCodeBlock onSelfAdd(String name, ByteCodeBlock value) {
+        ByteCodeMetadata.Var metaVar = findMetadataVar(name);
+        return ByteCodeBlock.build()
+                .append(InstructionExt.of(OpCode.LOAD_LOCAL, metaVar.index))
+                .append(value)
+                .append(InstructionExt.of(OpCode.INPLACE_ADD))
+                .append(InstructionExt.of(OpCode.STORE_LOCAL, metaVar.index));
+    }
+
+    @Override
+    public ByteCodeBlock onSelfSub(String name, ByteCodeBlock value) {
+        ByteCodeMetadata.Var metaVar = findMetadataVar(name);
+        return ByteCodeBlock.build()
+                            .append(InstructionExt.of(OpCode.LOAD_LOCAL, metaVar.index))
+                            .append(value)
+                            .append(InstructionExt.of(OpCode.INPLACE_SUBSTRACT))
+                            .append(InstructionExt.of(OpCode.STORE_LOCAL, metaVar.index));
+    }
+
+    @Override
+    public ByteCodeBlock onSelfMul(String name, ByteCodeBlock value) {
+        ByteCodeMetadata.Var metaVar = findMetadataVar(name);
+        return ByteCodeBlock.build()
+                            .append(InstructionExt.of(OpCode.LOAD_LOCAL, metaVar.index))
+                            .append(value)
+                            .append(InstructionExt.of(OpCode.INPLACE_MULTIPLY))
+                            .append(InstructionExt.of(OpCode.STORE_LOCAL, metaVar.index));
+    }
+
+    @Override
+    public ByteCodeBlock onSelfDiv(String name, ByteCodeBlock value) {
+        ByteCodeMetadata.Var metaVar = findMetadataVar(name);
+        return ByteCodeBlock.build()
+                            .append(InstructionExt.of(OpCode.LOAD_LOCAL, metaVar.index))
+                            .append(value)
+                            .append(InstructionExt.of(OpCode.INPLACE_DIVIDE))
+                            .append(InstructionExt.of(OpCode.STORE_LOCAL, metaVar.index));
+    }
+
+    @Override
+    public ByteCodeBlock onSelfMod(String name, ByteCodeBlock value) {
+        ByteCodeMetadata.Var metaVar = findMetadataVar(name);
+        return ByteCodeBlock.build()
+                            .append(InstructionExt.of(OpCode.LOAD_LOCAL, metaVar.index))
+                            .append(value)
+                            .append(InstructionExt.of(OpCode.INPLACE_MODULO))
+                            .append(InstructionExt.of(OpCode.STORE_LOCAL, metaVar.index));
+    }
+
+    @Override
     public ByteCodeBlock onDefinition(String name, ByteCodeBlock value) {
         return ByteCodeBlock.build()
                             .append(value)

@@ -62,26 +62,17 @@ public enum OpCode {
     GREATER_THAN_OR_EQUAL("GTEQ", OpLogic::GreaterThanOrEqual),
 
     // Inplace Operations
-    INPLACE_POWER("INPOW"),
+    // INPLACE_POWER("INPOW", OpLogic::InplacePow),
 
-    INPLACE_MODULO("INMOD"),
+    INPLACE_MODULO("INMOD", OpLogic::InplaceMod),
 
     INPLACE_ADD("INADD", OpLogic::InplaceAdd),
 
-    // TODO: implement inplace
-    INPLACE_SUBSTRACT("INSUB"),
+    INPLACE_SUBSTRACT("INSUB", OpLogic::InplaceSub),
 
-    INPLACE_MULTIPLY("INMUL"),
+    INPLACE_MULTIPLY("INMUL", OpLogic::InplaceMult),
 
-    INPLACE_DIVIDE("INDIV"),
-
-//    I_DIV("INPLACE_DIVIDE"),
-//
-//    I_MOD("INPLACE_MODULO"),
-//
-//    I_SUB("INPLACE_SUBSTRACT"),
-//
-//    I_ADD("INPLACE_ADD"),
+    INPLACE_DIVIDE("INDIV", OpLogic::InplaceDiv),
 
     INVALID("INVALID"),
 
