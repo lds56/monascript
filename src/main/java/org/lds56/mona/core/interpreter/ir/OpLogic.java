@@ -1,11 +1,13 @@
 package org.lds56.mona.core.interpreter.ir;
 
+import org.lds56.mona.core.exception.OutOfBoundException;
 import org.lds56.mona.core.interpreter.Context;
 import org.lds56.mona.core.interpreter.MonaBB;
 import org.lds56.mona.core.runtime.MonaCalculator;
 import org.lds56.mona.core.runtime.collections.MonaIter;
 import org.lds56.mona.core.runtime.traits.*;
 import org.lds56.mona.core.runtime.types.MonaBoolean;
+import org.lds56.mona.core.runtime.types.MonaNumber;
 import org.lds56.mona.core.runtime.types.MonaObject;
 
 import java.util.function.BinaryOperator;
@@ -309,6 +311,25 @@ public class OpLogic {
 
     public static Signal ReturnValue(Context context, Integer unused) {
         return Signal.emitRet(context.popOperand());
+    }
+
+    public static Signal Unpack(Context context, Integer argNum) {
+        MonaIndexable indexable = MonaTrait.cast(context.popOperand(), MonaIndexable.class);
+        int len = indexable.len();
+        if (len < argNum) {
+            throw new OutOfBoundException("Unpacked num out of bound");
+        }
+        if (len > argNum) {
+            for (int i=argNum-2; i>=0; i--) {
+                context.pushOperand(indexable.index(MonaNumber.newInteger(i)));
+            }
+            // TODO: add rest
+        } else {
+            for (int i=argNum-1; i>=0; i--) {
+                context.pushOperand(indexable.index(MonaNumber.newInteger(i)));
+            }
+        }
+        return Signal.emitNext();
     }
 
     public static Signal CallFunction(Context context, Integer argNum) {

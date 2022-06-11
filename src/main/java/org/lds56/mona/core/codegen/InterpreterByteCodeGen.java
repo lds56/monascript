@@ -6,6 +6,7 @@ import org.lds56.mona.core.interpreter.ir.OpCode;
 import org.lds56.mona.core.runtime.types.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author lds56
@@ -113,7 +114,7 @@ public class InterpreterByteCodeGen implements AbastractCodeGen<ByteCodeBlock> {
     public ByteCodeBlock onList(List<ByteCodeBlock> l) {
         return ByteCodeBlock.build()
                             .append(InstructionExt.of(OpCode.LOAD_GLOBAL, findMetadataVar("coll.list").index))
-                            .append(l)
+                            .merge(l)
                             .append(InstructionExt.of(OpCode.CALL_OBJECT, l.size()));
     }
 
@@ -121,7 +122,7 @@ public class InterpreterByteCodeGen implements AbastractCodeGen<ByteCodeBlock> {
     public ByteCodeBlock onSet(List<ByteCodeBlock> l) {
         return ByteCodeBlock.build()
                             .append(InstructionExt.of(OpCode.LOAD_GLOBAL, findMetadataVar("coll.set").index))
-                            .append(l)
+                            .merge(l)
                             .append(InstructionExt.of(OpCode.CALL_OBJECT, l.size()));
     }
 
@@ -129,7 +130,7 @@ public class InterpreterByteCodeGen implements AbastractCodeGen<ByteCodeBlock> {
     public ByteCodeBlock onMap(List<ByteCodeBlock> kv) {
         return ByteCodeBlock.build()
                             .append(InstructionExt.of(OpCode.LOAD_GLOBAL, findMetadataVar("coll.dict").index))
-                            .append(kv)
+                            .merge(kv)
                             .append(InstructionExt.of(OpCode.CALL_OBJECT, kv.size()));
     }
 
@@ -137,8 +138,8 @@ public class InterpreterByteCodeGen implements AbastractCodeGen<ByteCodeBlock> {
     public ByteCodeBlock onRange(int start, int end) {
         return ByteCodeBlock.build()
                             .append(InstructionExt.of(OpCode.LOAD_GLOBAL, findMetadataVar("coll.range").index))
-                            .append(onInteger(start))
-                            .append(onInteger(end))
+                            .merge(onInteger(start))
+                            .merge(onInteger(end))
                             .append(InstructionExt.of(OpCode.CALL_OBJECT, 2));
     }
 
@@ -187,15 +188,15 @@ public class InterpreterByteCodeGen implements AbastractCodeGen<ByteCodeBlock> {
     @Override
     public ByteCodeBlock onIndex(ByteCodeBlock obj, ByteCodeBlock index) {
         return ByteCodeBlock.build()
-                            .append(obj)
-                            .append(index)
+                            .merge(obj)
+                            .merge(index)
                             .append(InstructionExt.of(OpCode.INDEX_ACCESS));
     }
 
     @Override
     public ByteCodeBlock onProperty(ByteCodeBlock obj, String attr) {
         return ByteCodeBlock.build()
-                            .append(obj)
+                            .merge(obj)
                             .append(InstructionExt.of(OpCode.LOAD_CONSTANT, metaStack.peek().getConstIndex(MonaString.valueOf(attr))))
                             .append(InstructionExt.of(OpCode.PROP_ACCESS));
     }
@@ -203,40 +204,40 @@ public class InterpreterByteCodeGen implements AbastractCodeGen<ByteCodeBlock> {
     @Override
     public ByteCodeBlock onAdd(ByteCodeBlock lhs, ByteCodeBlock rhs) {
         return ByteCodeBlock.build()
-                            .append(lhs)
-                            .append(rhs)
+                            .merge(lhs)
+                            .merge(rhs)
                             .append(InstructionExt.of(OpCode.BINARY_ADD));
     }
 
     @Override
     public ByteCodeBlock onSub(ByteCodeBlock lhs, ByteCodeBlock rhs) {
         return ByteCodeBlock.build()
-                            .append(lhs)
-                            .append(rhs)
+                            .merge(lhs)
+                            .merge(rhs)
                             .append(InstructionExt.of(OpCode.BINARY_SUBSTRACT));
     }
 
     @Override
     public ByteCodeBlock onMul(ByteCodeBlock lhs, ByteCodeBlock rhs) {
         return ByteCodeBlock.build()
-                            .append(lhs)
-                            .append(rhs)
+                            .merge(lhs)
+                            .merge(rhs)
                             .append(InstructionExt.of(OpCode.BINARY_MULTIPLY));
     }
 
     @Override
     public ByteCodeBlock onDiv(ByteCodeBlock lhs, ByteCodeBlock rhs) {
         return ByteCodeBlock.build()
-                            .append(lhs)
-                            .append(rhs)
+                            .merge(lhs)
+                            .merge(rhs)
                             .append(InstructionExt.of(OpCode.BINARY_DIVIDE));
     }
 
     @Override
     public ByteCodeBlock onMod(ByteCodeBlock lhs, ByteCodeBlock rhs) {
         return ByteCodeBlock.build()
-                            .append(lhs)
-                            .append(rhs)
+                            .merge(lhs)
+                            .merge(rhs)
                             .append(InstructionExt.of(OpCode.BINARY_MODULO));
     }
 
@@ -253,100 +254,100 @@ public class InterpreterByteCodeGen implements AbastractCodeGen<ByteCodeBlock> {
     @Override
     public ByteCodeBlock onEq(ByteCodeBlock lhs, ByteCodeBlock rhs) {
         return ByteCodeBlock.build()
-                            .append(lhs).append(rhs)
+                            .merge(lhs).merge(rhs)
                             .append(InstructionExt.of(OpCode.EQUAL));
     }
 
     @Override
     public ByteCodeBlock onNeq(ByteCodeBlock lhs, ByteCodeBlock rhs) {
         return ByteCodeBlock.build()
-                            .append(lhs).append(rhs)
+                            .merge(lhs).merge(rhs)
                             .append(InstructionExt.of(OpCode.NOT_EQUAL));
     }
 
     @Override
     public ByteCodeBlock onLt(ByteCodeBlock lhs, ByteCodeBlock rhs) {
         return ByteCodeBlock.build()
-                            .append(lhs).append(rhs)
+                            .merge(lhs).merge(rhs)
                             .append(InstructionExt.of(OpCode.LESS_THAN));
     }
 
     @Override
     public ByteCodeBlock onLte(ByteCodeBlock lhs, ByteCodeBlock rhs) {
         return ByteCodeBlock.build()
-                            .append(lhs).append(rhs)
+                            .merge(lhs).merge(rhs)
                             .append(InstructionExt.of(OpCode.LESS_THAN_OR_EQUAL));
     }
 
     @Override
     public ByteCodeBlock onGt(ByteCodeBlock lhs, ByteCodeBlock rhs) {
         return ByteCodeBlock.build()
-                            .append(lhs).append(rhs)
+                            .merge(lhs).merge(rhs)
                             .append(InstructionExt.of(OpCode.GREATER_THAN));
     }
 
     @Override
     public ByteCodeBlock onGte(ByteCodeBlock lhs, ByteCodeBlock rhs) {
         return ByteCodeBlock.build()
-                            .append(lhs).append(rhs)
+                            .merge(lhs).merge(rhs)
                             .append(InstructionExt.of(OpCode.GREATER_THAN_OR_EQUAL));
     }
 
     @Override
     public ByteCodeBlock onAnd(ByteCodeBlock lhs, ByteCodeBlock rhs) {
         return ByteCodeBlock.build()
-                            .append(lhs)
-                            .append(rhs)
+                            .merge(lhs)
+                            .merge(rhs)
                             .append(InstructionExt.of(OpCode.LOGIC_AND));
     }
 
     @Override
     public ByteCodeBlock onOr(ByteCodeBlock lhs, ByteCodeBlock rhs) {
         return ByteCodeBlock.build()
-                            .append(lhs)
-                            .append(rhs)
+                            .merge(lhs)
+                            .merge(rhs)
                             .append(InstructionExt.of(OpCode.LOGIC_OR));
     }
 
     @Override
     public ByteCodeBlock onBitAnd(ByteCodeBlock lhs, ByteCodeBlock rhs) {
         return ByteCodeBlock.build()
-                            .append(lhs).append(rhs)
+                            .merge(lhs).merge(rhs)
                             .append(InstructionExt.of(OpCode.BIT_AND));
     }
 
     @Override
     public ByteCodeBlock onBitOr(ByteCodeBlock lhs, ByteCodeBlock rhs) {
         return ByteCodeBlock.build()
-                            .append(lhs).append(rhs)
+                            .merge(lhs).merge(rhs)
                             .append(InstructionExt.of(OpCode.BIT_OR));
     }
 
     @Override
     public ByteCodeBlock onBitXor(ByteCodeBlock lhs, ByteCodeBlock rhs) {
         return ByteCodeBlock.build()
-                            .append(lhs).append(rhs)
+                            .merge(lhs).merge(rhs)
                             .append(InstructionExt.of(OpCode.BIT_XOR));
     }
 
     @Override
     public ByteCodeBlock onNeg(ByteCodeBlock value) {
         return ByteCodeBlock.build()
-                            .append(value)
+                            .merge(value)
                             .append(InstructionExt.of(OpCode.UNARY_NEGATIVE));
     }
 
     @Override
     public ByteCodeBlock onBitNot(ByteCodeBlock value) {
         return ByteCodeBlock.build()
-                            .append(value)
+                            .merge(value)
                             .append(InstructionExt.of(OpCode.BIT_NOT));
     }
 
     @Override
     public ByteCodeBlock onNot(ByteCodeBlock value) {
         return ByteCodeBlock.build()
-                            .append(value)
+                            .merge(value)
                             .append(InstructionExt.of(OpCode.LOGIC_NOT));
     }
 
@@ -368,7 +369,7 @@ public class InterpreterByteCodeGen implements AbastractCodeGen<ByteCodeBlock> {
         ByteCodeMetadata.Var metaVar = findMetadataVar(name);
         return ByteCodeBlock.build()
                 .append(InstructionExt.of(OpCode.LOAD_LOCAL, metaVar.index))
-                .append(value)
+                .merge(value)
                 .append(InstructionExt.of(OpCode.INPLACE_ADD))
                 .append(InstructionExt.of(OpCode.STORE_LOCAL, metaVar.index));
     }
@@ -378,7 +379,7 @@ public class InterpreterByteCodeGen implements AbastractCodeGen<ByteCodeBlock> {
         ByteCodeMetadata.Var metaVar = findMetadataVar(name);
         return ByteCodeBlock.build()
                             .append(InstructionExt.of(OpCode.LOAD_LOCAL, metaVar.index))
-                            .append(value)
+                            .merge(value)
                             .append(InstructionExt.of(OpCode.INPLACE_SUBSTRACT))
                             .append(InstructionExt.of(OpCode.STORE_LOCAL, metaVar.index));
     }
@@ -388,7 +389,7 @@ public class InterpreterByteCodeGen implements AbastractCodeGen<ByteCodeBlock> {
         ByteCodeMetadata.Var metaVar = findMetadataVar(name);
         return ByteCodeBlock.build()
                             .append(InstructionExt.of(OpCode.LOAD_LOCAL, metaVar.index))
-                            .append(value)
+                            .merge(value)
                             .append(InstructionExt.of(OpCode.INPLACE_MULTIPLY))
                             .append(InstructionExt.of(OpCode.STORE_LOCAL, metaVar.index));
     }
@@ -398,7 +399,7 @@ public class InterpreterByteCodeGen implements AbastractCodeGen<ByteCodeBlock> {
         ByteCodeMetadata.Var metaVar = findMetadataVar(name);
         return ByteCodeBlock.build()
                             .append(InstructionExt.of(OpCode.LOAD_LOCAL, metaVar.index))
-                            .append(value)
+                            .merge(value)
                             .append(InstructionExt.of(OpCode.INPLACE_DIVIDE))
                             .append(InstructionExt.of(OpCode.STORE_LOCAL, metaVar.index));
     }
@@ -408,7 +409,7 @@ public class InterpreterByteCodeGen implements AbastractCodeGen<ByteCodeBlock> {
         ByteCodeMetadata.Var metaVar = findMetadataVar(name);
         return ByteCodeBlock.build()
                             .append(InstructionExt.of(OpCode.LOAD_LOCAL, metaVar.index))
-                            .append(value)
+                            .merge(value)
                             .append(InstructionExt.of(OpCode.INPLACE_MODULO))
                             .append(InstructionExt.of(OpCode.STORE_LOCAL, metaVar.index));
     }
@@ -416,7 +417,7 @@ public class InterpreterByteCodeGen implements AbastractCodeGen<ByteCodeBlock> {
     @Override
     public ByteCodeBlock onDefinition(String name, ByteCodeBlock value) {
         return ByteCodeBlock.build()
-                            .append(value)
+                            .merge(value)
                             .append(InstructionExt.of(OpCode.STORE_LOCAL, metaStack.peek().newVarNameIndex(name)));
     }
 
@@ -424,14 +425,18 @@ public class InterpreterByteCodeGen implements AbastractCodeGen<ByteCodeBlock> {
     public ByteCodeBlock onAssignment(String name, ByteCodeBlock value) {
         ByteCodeMetadata.Var metaVar = findMetadataVar(name);
         return ByteCodeBlock.build()
-                            .append(value)
+                            .merge(value)
                             .append(InstructionExt.of(metaVar.isLocal? OpCode.STORE_LOCAL : OpCode.STORE_GLOBAL, metaVar.index));
     }
 
     @Override
     public ByteCodeBlock onDestructuring(List<String> names, ByteCodeBlock value) {
-        // TODO: descturing assignment let a, b = pair;
-        return null;
+        return ByteCodeBlock.build()
+                            .merge(value)
+                            .append(InstructionExt.of(OpCode.UNPACK, names.size()))
+                            .append(names.stream()
+                                         .map(name -> InstructionExt.of(OpCode.STORE_LOCAL, metaStack.peek().newVarNameIndex(name)))
+                                         .collect(Collectors.toList()));
     }
 
     @Override
@@ -455,29 +460,29 @@ public class InterpreterByteCodeGen implements AbastractCodeGen<ByteCodeBlock> {
 
     @Override
     public ByteCodeBlock onArguments(List<ByteCodeBlock> argValues) {
-        return ByteCodeBlock.build().append(argValues);
+        return ByteCodeBlock.build().merge(argValues);
     }
 
     @Override
     public ByteCodeBlock onMemberCall(ByteCodeBlock obj, String memberName, List<ByteCodeBlock> args) {
         return ByteCodeBlock.build()
-                .append(obj)
+                .merge(obj)
                 .append(InstructionExt.of(OpCode.LOAD_CONSTANT, metaStack.peek().getConstIndex(MonaString.valueOf(memberName))))
-                .append(args)
+                .merge(args)
                 .append(InstructionExt.of(OpCode.CALL_METHOD, args.size()));
     }
 
     @Override
     public ByteCodeBlock onFuncCall(ByteCodeBlock func, List<ByteCodeBlock> args) {
         return ByteCodeBlock.build()
-                            .append(func)
-                            .append(args)
+                            .merge(func)
+                            .merge(args)
                             .append(InstructionExt.of(OpCode.CALL_FUNCTION, args.size()));
     }
 
     @Override
     public ByteCodeBlock onComma(ByteCodeBlock last, ByteCodeBlock value) {
-        return last.append(value);
+        return last.merge(value);
     }
 
     // COND
@@ -487,9 +492,9 @@ public class InterpreterByteCodeGen implements AbastractCodeGen<ByteCodeBlock> {
     @Override
     public ByteCodeBlock onIf(ByteCodeBlock cond, ByteCodeBlock tvalue) {
         return ByteCodeBlock.build()
-                            .append(cond)
+                            .merge(cond)
                             .append(InstructionExt.of(OpCode.BRANCH_FALSE, metaStack.peek().getCondEndLabel(1)))
-                            .append(tvalue)
+                            .merge(tvalue)
                             .append(InstructionExt.labelOf(metaStack.peek().getCondEndLabel(-1)));
     }
 
@@ -503,19 +508,19 @@ public class InterpreterByteCodeGen implements AbastractCodeGen<ByteCodeBlock> {
     @Override
     public ByteCodeBlock onIfElse(ByteCodeBlock cond, ByteCodeBlock tvalue, ByteCodeBlock fvalue) {
         return ByteCodeBlock.build()
-                            .append(cond)
+                            .merge(cond)
                             .append(InstructionExt.of(OpCode.BRANCH_FALSE, metaStack.peek().getCondElseLabel(1)))
-                            .append(tvalue)
+                            .merge(tvalue)
                             .append(InstructionExt.of(OpCode.JUMP_LOCAL, metaStack.peek().getCondEndLabel(0)))
                             .append(InstructionExt.labelOf(metaStack.peek().getCondElseLabel(0)))
-                            .append(fvalue)
+                            .merge(fvalue)
                             .append(InstructionExt.labelOf(metaStack.peek().getCondEndLabel(-1)));
     }
 
     @Override
     public ByteCodeBlock onReturn(ByteCodeBlock value) {
         return ByteCodeBlock.build()
-                            .append(value)
+                            .merge(value)
                             .append(InstructionExt.of(OpCode.RETURN_VALUE));
     }
 
@@ -533,9 +538,9 @@ public class InterpreterByteCodeGen implements AbastractCodeGen<ByteCodeBlock> {
     public ByteCodeBlock onWhile(ByteCodeBlock cond, ByteCodeBlock loopBody) {
         return ByteCodeBlock.build()
                             .append(InstructionExt.labelOf(metaStack.peek().enterLoopLabel()))
-                            .append(cond)
+                            .merge(cond)
                             .append(InstructionExt.of(OpCode.BRANCH_FALSE, metaStack.peek().getLoopEndLabel()))
-                            .append(loopBody)
+                            .merge(loopBody)
                             .append(InstructionExt.of(OpCode.JUMP_LOCAL, metaStack.peek().getLoopStartLabel()))
                             .append(InstructionExt.labelOf(metaStack.peek().exitLoopLabel()));
     }
@@ -549,13 +554,13 @@ public class InterpreterByteCodeGen implements AbastractCodeGen<ByteCodeBlock> {
     @Override
     public ByteCodeBlock onForIn(String iterName, ByteCodeBlock list, ByteCodeBlock loopBody) {
         return ByteCodeBlock.build()
-                            .append(list)
+                            .merge(list)
                             .append(InstructionExt.of(OpCode.GET_ITERATOR))
                             .append(InstructionExt.labelOf(metaStack.peek().enterLoopLabel()))
                             .append(InstructionExt.of(OpCode.NEXT_ITERATOR))
                             .append(InstructionExt.of(OpCode.BRANCH_FALSE, metaStack.peek().getLoopEndLabel()))
                             .append(InstructionExt.of(OpCode.STORE_LOCAL, metaStack.peek().getVarNameIndex(iterName)))
-                            .append(loopBody)
+                            .merge(loopBody)
                             .append(InstructionExt.of(OpCode.JUMP_LOCAL, metaStack.peek().getLoopStartLabel()))
                             .append(InstructionExt.labelOf(metaStack.peek().exitLoopLabel()));
     }

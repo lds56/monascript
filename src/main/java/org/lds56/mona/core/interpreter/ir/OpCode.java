@@ -150,6 +150,8 @@ public enum OpCode {
 
     RETURN_VALUE("RETVAL", OpLogic::ReturnValue),
 
+    UNPACK("UNPACK", OpLogic::Unpack),
+
     ;
 
     private final String repr;

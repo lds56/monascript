@@ -38,16 +38,21 @@ public class ByteCodeBlock {
         return this;
     }
 
-    public ByteCodeBlock append(ByteCodeBlock block) {
+    public ByteCodeBlock append(List<InstructionExt> instrs) {
+        instrList.addAll(instrs);
+        return this;
+    }
+
+    public ByteCodeBlock merge(ByteCodeBlock block) {
         if (block != null) {
             this.instrList.addAll(block.instrList);
         }
         return this;
     }
 
-    public ByteCodeBlock append(List<ByteCodeBlock> blocks) {
+    public ByteCodeBlock merge(List<ByteCodeBlock> blocks) {
         if (blocks != null) {
-            blocks.forEach(this::append);
+            blocks.forEach(this::merge);
         }
         return this;
     }
