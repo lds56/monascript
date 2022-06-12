@@ -231,7 +231,7 @@ public class ASTParserVisitor<T> extends MonaParserBaseVisitor<T> {
             return codeGen.onDefinition(ctx.ids().ID(0).getText(), visit(ctx.expr()));
         }
         else {
-            return codeGen.onDestructuring(ctx.ids().ID().stream().map(ParseTree::getText).collect(Collectors.toList()), visit(ctx.expr()));
+            return codeGen.onDefinitionUnpacked(ctx.ids().ID().stream().map(ParseTree::getText).collect(Collectors.toList()), visit(ctx.expr()));
         }
     }
 
@@ -337,8 +337,17 @@ public class ASTParserVisitor<T> extends MonaParserBaseVisitor<T> {
 
     @Override
     public T visitForStat(ForStatContext ctx) {
-        codeGen.onIter(ctx.ID().getText());
-        return codeGen.onForIn(ctx.ID().getText(), visit(ctx.expr()), visit(ctx.block()));
+        if (ctx.ids().ID().size() == 1) {
+            return codeGen.onForIn(
+                    codeGen.onIter(ctx.ids().ID(0).getText()),
+                    visit(ctx.expr()),
+                    visit(ctx.block()));
+        } else {
+            return codeGen.onForIn(
+                    codeGen.onIterUnpacked(ctx.ids().ID().stream().map(id -> id.getText()).collect(Collectors.toList())),
+                    visit(ctx.expr()),
+                    visit(ctx.block()));
+        }
     }
 
     // Branch

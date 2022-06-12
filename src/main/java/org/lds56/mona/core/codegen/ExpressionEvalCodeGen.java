@@ -250,7 +250,7 @@ public class ExpressionEvalCodeGen implements AbastractCodeGen<MonaObject> {
     }
 
     @Override
-    public MonaObject onDestructuring(List<String> names, MonaObject value) {
+    public MonaObject onDefinitionUnpacked(List<String> names, MonaObject value) {
         return null;
     }
 
@@ -322,11 +322,16 @@ public class ExpressionEvalCodeGen implements AbastractCodeGen<MonaObject> {
 
     @Override
     public MonaObject onIter(String iterName) {
-        return null;
+        throw new SyntaxNotSupportedException("`For-in` is not supported in expression evaluation");
     }
 
     @Override
-    public MonaObject onForIn(String iterName, MonaObject list, MonaObject loopBody) {
+    public MonaObject onIterUnpacked(List<String> iterNames) {
+        throw new SyntaxNotSupportedException("`For-in` is not supported in expression evaluation");
+    }
+
+    @Override
+    public MonaObject onForIn(MonaObject iterName, MonaObject list, MonaObject loopBody) {
         throw new SyntaxNotSupportedException("`For-in` is not supported in expression evaluation");
     }
 

@@ -97,7 +97,7 @@ public interface AbastractCodeGen<T> {
 
     T onAssignment(String name, T value);
 
-    T onDestructuring(List<String> names, T value);
+    T onDefinitionUnpacked(List<String> names, T value);
 
     T onParameters(List<String> argNames);
 
@@ -127,7 +127,9 @@ public interface AbastractCodeGen<T> {
 
     T onIter(String iterName);
 
-    T onForIn(String iterName, T list, T loopBody);
+    T onIterUnpacked(List<String> iterNames);
+
+    T onForIn(T iter, T list, T loopBody);
 
     // T onLambda(List<String> argNames, dx)
 

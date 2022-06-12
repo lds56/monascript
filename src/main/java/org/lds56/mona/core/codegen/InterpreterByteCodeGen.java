@@ -430,7 +430,7 @@ public class InterpreterByteCodeGen implements AbastractCodeGen<ByteCodeBlock> {
     }
 
     @Override
-    public ByteCodeBlock onDestructuring(List<String> names, ByteCodeBlock value) {
+    public ByteCodeBlock onDefinitionUnpacked(List<String> names, ByteCodeBlock value) {
         return ByteCodeBlock.build()
                             .merge(value)
                             .append(InstructionExt.of(OpCode.UNPACK, names.size()))
@@ -547,19 +547,27 @@ public class InterpreterByteCodeGen implements AbastractCodeGen<ByteCodeBlock> {
 
     @Override
     public ByteCodeBlock onIter(String iterName) {
-        metaStack.peek().newVarNameIndex(iterName);
-        return null;
+        return ByteCodeBlock.build(InstructionExt.of(OpCode.STORE_LOCAL, metaStack.peek().newVarNameIndex(iterName)));
     }
 
     @Override
-    public ByteCodeBlock onForIn(String iterName, ByteCodeBlock list, ByteCodeBlock loopBody) {
+    public ByteCodeBlock onIterUnpacked(List<String> iterNames) {
+        return ByteCodeBlock.build()
+                            .append(InstructionExt.of(OpCode.UNPACK, iterNames.size()))
+                            .append(iterNames.stream()
+                                             .map(name -> InstructionExt.of(OpCode.STORE_LOCAL, metaStack.peek().newVarNameIndex(name)))
+                                             .collect(Collectors.toList()));
+    }
+
+    @Override
+    public ByteCodeBlock onForIn(ByteCodeBlock iter, ByteCodeBlock list, ByteCodeBlock loopBody) {
         return ByteCodeBlock.build()
                             .merge(list)
                             .append(InstructionExt.of(OpCode.GET_ITERATOR))
                             .append(InstructionExt.labelOf(metaStack.peek().enterLoopLabel()))
                             .append(InstructionExt.of(OpCode.NEXT_ITERATOR))
                             .append(InstructionExt.of(OpCode.BRANCH_FALSE, metaStack.peek().getLoopEndLabel()))
-                            .append(InstructionExt.of(OpCode.STORE_LOCAL, metaStack.peek().getVarNameIndex(iterName)))
+                            .merge(iter)
                             .merge(loopBody)
                             .append(InstructionExt.of(OpCode.JUMP_LOCAL, metaStack.peek().getLoopStartLabel()))
                             .append(InstructionExt.labelOf(metaStack.peek().exitLoopLabel()));

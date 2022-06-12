@@ -24,7 +24,7 @@ complex_stat
     | CONTINUE SEMI_COLON                 # continueStat
     | BREAK SEMI_COLON                    # breakStat
     | WHILE expr block                    # whileStat
-    | FOR ID IN expr block                # forStat
+    | FOR ids IN expr block                # forStat
     | IF expr block (ELSE block)?         # ifStat
     | TRY block CATCH (identity | LPAREN identity RPAREN)? block (FINALLY block)?            # tryStat
     | THROW expr SEMI_COLON               # throwStat
@@ -55,7 +55,7 @@ anonymous_func
 
 expr
     : <assoc=right> ID ASSIGN value_expr                                   # assignmentExpr
-    | <assoc=right> identity op=(SELF_ADD | SELF_SUB | SELF_MUL | SELF_DIV | SELF_MOD) value_expr   # selfAssignmentExpr
+    | <assoc=right> ID op=(SELF_ADD | SELF_SUB | SELF_MUL | SELF_DIV | SELF_MOD) value_expr   # selfAssignmentExpr
     | <assoc=right> value_expr QUESTION expr COLON expr  # ternaryExpr      // TODO: Move to below
     | value_expr                # valueExpr
     ;
@@ -106,6 +106,7 @@ collLiteral
     :   LBRACKET ( expr (COMMA expr)* )? RBRACKET                  # listLiteral
     |   LBRACE   ( expr (COMMA expr)* )? RBRACE                    # setLiteral
     |   LBRACE   ((mapEntry (COMMA mapEntry)*) | COLON ) RBRACE    # mapLiteral
+    // |   LPAREN   (expr* RPAREN
     |   INTEGER   (DOOT | DOOOT) INTEGER                           # rangeLiteral
     ;
 
