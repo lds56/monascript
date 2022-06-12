@@ -58,4 +58,45 @@ public class CollectionTest extends ScriptTest {
         Object o = engine.execute(s);
         Assertions.assertEquals(o, 55);
     }
+
+
+    @Test
+    public void testUnpackList() {
+        String s = "let x, y = l;" +
+                   "return x+y;";
+        Object o = engine.execute(s, TestUtils.inputOf("l", Arrays.asList(1,2)));
+        Assertions.assertEquals(o, 3);
+    }
+
+    @Test
+    public void testUnpackSet() {
+        String s = "let x, y, z = [1, 2, 3];" +
+                   "return x+y+z;";
+        Object o = engine.execute(s);
+        Assertions.assertEquals(o, 6);
+    }
+
+    @Test
+    public void testUnpackForIn() {
+        String s = "let l = [[1,1], [2,2], [3,3]];" +
+                   "let ans = 0;" +
+                   "for x,y in l {" +
+                   "    ans += x + y;" +
+                   "}" +
+                   "return ans";
+        Object o = engine.execute(s);
+        Assertions.assertEquals(o, 12);
+    }
+
+    @Test
+    public void testUnpackForInMap() {
+        String s = "let m = {'a': 1, 'b': 2, 'c': 3};" +
+                   "let ans = 0;" +
+                   "for k,v in m {" +
+                   "    ans += v;" +
+                   "}" +
+                   "return ans";
+        Object o = engine.execute(s);
+        Assertions.assertEquals(o, 6);
+    }
 }
