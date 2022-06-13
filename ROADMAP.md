@@ -11,9 +11,11 @@
   - [x] Condition Statement
   - [x] Loop Statement
   - [x] Lambda & Closure
-  - [ ] Safe ? mark
+·  - [ ] Safe ? Mark
+  - [ ] Match Expression
 - [ ] Optimization
   - [ ] Compilation (MonaScript -> MonaIR)
-  - [ ] Runtime
+  - [ ] Runtime\
+- [ ] Serialization/Deserialization
 - [ ] Implemented by other PL
 - [ ] Bootstrapping!!!
