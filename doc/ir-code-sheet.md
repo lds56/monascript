@@ -213,7 +213,7 @@ fn addgen(x) {
 }
 let adder1 = addgen(1);
 let adder2 = addgen(2);
-return adder1(1) + adder2(2)
+return adder1(1) + adder2(2);
 ```
 ```
 __main__: bbi=0
@@ -252,9 +252,56 @@ LOCAL_VAR   :   [y]
 2 | ADD
 3 | RETVAL
 ```
-
-
-
+# Structure
+```
+let l = [1,2,3];
+let m = {1: "1", "2": 2};
+return l[1] + m["2"];
+```
+```
+CONST_VAL   :   [Nil, 1, 2, 3, "1", "2"]
+LOCAL_VAR   :   [l, m]
+GLOBAL_VAR  :   [list, dict]
+0 | LOADC   1
+1 | LOADC   2
+2 | LOADC   3
+3 | LOADG   0
+4 | CALLO   3   
+5 | STOREL  0
+6 | LOADC   1   
+7 | LOADC   4
+8 | LOADC   5
+9 | LOADC   2
+10| LOADG   1
+11| CALLO   4
+12| STOREL  1
+13| LOADL   0
+14| LOADC   1
+14| INDEX
+15| LOADL   1
+16| LOADC   5
+17| INDEX
+17| ADD
+18| RETVAL
+```
+# Destructuring
+```
+let x, y = l;
+return x+y;
+```
+```
+CONST_VAL   :   [Nil]
+LOCAL_VAR   :   [x, y]
+GLOBAL_VAR  :   [l]
+0 | LOADG   0
+1 | UNPACK  2
+2 | STOREL  0
+3 | STOREL  1
+4 | LOADL   0
+5 | LOADL   1
+6 | ADD
+7 | RETVAL
+```
 
 
 

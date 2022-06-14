@@ -55,12 +55,23 @@ public class MonaEngine {
 
     // script
     public MonaScript compile(String code) {
+        return compile(code, false);
+    }
 
-        String key = MD5Utils.encode(code);
-        if (scriptCache.containsKey(key)) {
-            return scriptCache.get(key);
+    public MonaScript compile(String code, boolean useCache) {
+
+        if (useCache) {
+            String key = MD5Utils.encode(code);
+            if (scriptCache.containsKey(key)) {
+                return scriptCache.get(key);
+            }
+            MonaScript script = ScriptComposer.create(code);
+            scriptCache.put(key, script);
+            return script;
+
+        } else {
+            return ScriptComposer.create(code);
         }
-        return ScriptComposer.create(code);
     }
 
     public Object execute(String code) {

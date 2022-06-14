@@ -10,9 +10,15 @@ repositories {
 }
 
 dependencies {
+    // https://mvnrepository.com/artifact/commons-beanutils/commons-beanutils
+    implementation 'commons-beanutils:commons-beanutils:1.9.4'
+    implementation 'commons-logging:commons-logging:1.2'
+    testImplementation  'org.openjdk.jmh:jmh-core:1.35'
+    testAnnotationProcessor  'org.openjdk.jmh:jmh-generator-annprocess:1.35'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+    testImplementation 'com.googlecode.aviator:aviator:5.3.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
-    implementation 'org.antlr:antlr4:4.9.2'
+    implementation 'org.antlr:antlr4:4.9.1'
 }
 
 test {
