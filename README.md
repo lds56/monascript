@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./mona-icon.svg" />
+  <img src="./mona-logo.svg" />
 </p>
 <br>
 <br>
