@@ -518,10 +518,27 @@ public class InterpreterByteCodeGen implements AbastractCodeGen<ByteCodeBlock> {
     }
 
     @Override
-    public ByteCodeBlock onReturn(ByteCodeBlock value) {
+    public ByteCodeBlock onReturn(List<ByteCodeBlock> value) {
+        if (value.isEmpty()) {
+            throw new IllegalArgumentException("Need value to return");
+        }
+        if (value.size() == 1) {
+            return ByteCodeBlock.build()
+                                .merge(value.get(0))
+                                .append(InstructionExt.of(OpCode.RETURN_VALUE));
+        }
+        else {
+            return ByteCodeBlock.build()
+                                .merge(value)
+                                .append(InstructionExt.of(OpCode.MAKE_TUPLE, value.size()))
+                                .append(InstructionExt.of(OpCode.RETURN_VALUE));
+        }
+    }
+
+    @Override
+    public ByteCodeBlock onNoneReturn() {
         return ByteCodeBlock.build()
-                            .merge(value)
-                            .append(InstructionExt.of(OpCode.RETURN_VALUE));
+                            .append(InstructionExt.of(OpCode.RETURN_NONE));
     }
 
     @Override

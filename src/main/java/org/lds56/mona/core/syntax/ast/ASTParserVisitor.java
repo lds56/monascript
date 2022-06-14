@@ -353,7 +353,12 @@ public class ASTParserVisitor<T> extends MonaParserBaseVisitor<T> {
     // Branch
     @Override
     public T visitReturnStat(ReturnStatContext ctx) {
-        return codeGen.onReturn(visit(ctx.expr()));
+        return codeGen.onReturn(ctx.expr().stream().map(this::visit).collect(Collectors.toList()));
+    }
+
+    @Override
+    public T visitNoneReturnStat(NoneReturnStatContext ctx) {
+        return codeGen.onNoneReturn();
     }
 
     @Override

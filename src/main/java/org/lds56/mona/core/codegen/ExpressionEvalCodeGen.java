@@ -301,7 +301,12 @@ public class ExpressionEvalCodeGen implements AbastractCodeGen<MonaObject> {
     }
 
     @Override
-    public MonaObject onReturn(MonaObject value) {
+    public MonaObject onReturn(List<MonaObject> value) {
+        throw new SyntaxNotSupportedException("`Return` is not supported in expression evaluation");
+    }
+
+    @Override
+    public MonaObject onNoneReturn() {
         throw new SyntaxNotSupportedException("`Return` is not supported in expression evaluation");
     }
 

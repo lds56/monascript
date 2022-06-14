@@ -1,10 +1,11 @@
 package org.lds56.mona.core.interpreter.ir;
 
-import org.lds56.mona.core.exception.OutOfBoundException;
+import org.lds56.mona.core.exception.InvalidArgumentException;
 import org.lds56.mona.core.interpreter.Context;
 import org.lds56.mona.core.interpreter.MonaBB;
 import org.lds56.mona.core.runtime.MonaCalculator;
 import org.lds56.mona.core.runtime.collections.MonaIter;
+import org.lds56.mona.core.runtime.collections.MonaTuple;
 import org.lds56.mona.core.runtime.traits.*;
 import org.lds56.mona.core.runtime.types.MonaBoolean;
 import org.lds56.mona.core.runtime.types.MonaNumber;
@@ -309,6 +310,10 @@ public class OpLogic {
         return BranchBinaryOpLogic(context, index, MonaCalculator::lte);
     }
 
+    public static Signal ReturnNone(Context context, Integer unused) {
+        return Signal.emitRet();
+    }
+
     public static Signal ReturnValue(Context context, Integer unused) {
         return Signal.emitRet(context.popOperand());
     }
@@ -317,17 +322,13 @@ public class OpLogic {
         MonaIndexable indexable = MonaTrait.cast(context.popOperand(), MonaIndexable.class);
         int len = indexable.len();
         if (len < argNum) {
-            throw new OutOfBoundException("Unpacked num out of bound");
+            throw new InvalidArgumentException("Not enough values to unpack, " + argNum + " expected, " + len + " got");
         }
         if (len > argNum) {
-            for (int i=argNum-2; i>=0; i--) {
-                context.pushOperand(indexable.index(MonaNumber.newInteger(i)));
-            }
-            // TODO: add rest
-        } else {
-            for (int i=argNum-1; i>=0; i--) {
-                context.pushOperand(indexable.index(MonaNumber.newInteger(i)));
-            }
+            throw new InvalidArgumentException("Too many values to unpack, " + argNum + " expected, " + len + " got");
+        }
+        for (int i=argNum-1; i>=0; i--) {
+            context.pushOperand(indexable.index(MonaNumber.newInteger(i)));
         }
         return Signal.emitNext();
     }
@@ -355,6 +356,12 @@ public class OpLogic {
 
     public static Signal MakeFunction(Context context, Integer flag) {
         context.pushOperand(new MonaBB(flag));      // TODO: change MonaBB
+        return Signal.emitNext();
+    }
+
+    public static Signal MakeTuple(Context context, Integer argNum) {
+        MonaObject[] args = context.popArgs(argNum);
+        context.pushOperand(MonaTuple.newTuple(args));
         return Signal.emitNext();
     }
 

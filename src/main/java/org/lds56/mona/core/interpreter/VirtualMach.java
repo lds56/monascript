@@ -108,6 +108,7 @@ public class VirtualMach {
     }
 
     private void pushRetVal(MonaObject retVal, Frame freeFrame) {
+        // TODO: change to isBB
         if (retVal instanceof MonaBB) {
             // if return function => a closure constructed
             // attach callee's frame to fucnction

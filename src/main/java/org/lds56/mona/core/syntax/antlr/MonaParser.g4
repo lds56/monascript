@@ -20,11 +20,12 @@ stat
 complex_stat
     : block                               # blockStat
     | FUNCTION ID parameters block        # funcStat
-    | RETURN expr SEMI_COLON              # returnStat
+    | RETURN expr (COMMA expr)* SEMI_COLON     # returnStat
+    | RETURN SEMI_COLON                   # noneReturnStat
     | CONTINUE SEMI_COLON                 # continueStat
     | BREAK SEMI_COLON                    # breakStat
     | WHILE expr block                    # whileStat
-    | FOR ids IN expr block                # forStat
+    | FOR ids IN expr block               # forStat
     | IF expr block (ELSE block)?         # ifStat
     | TRY block CATCH (identity | LPAREN identity RPAREN)? block (FINALLY block)?            # tryStat
     | THROW expr SEMI_COLON               # throwStat

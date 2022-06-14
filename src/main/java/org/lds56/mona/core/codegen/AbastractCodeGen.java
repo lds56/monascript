@@ -117,7 +117,9 @@ public interface AbastractCodeGen<T> {
 
     T onIfElse(T cond, T tvalue, T fvalue);
 
-    T onReturn(T value);
+    T onReturn(List<T> value);
+
+    T onNoneReturn();
 
     T onContinue();
 

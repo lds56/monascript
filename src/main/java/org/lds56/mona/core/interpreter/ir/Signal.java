@@ -1,6 +1,7 @@
 package org.lds56.mona.core.interpreter.ir;
 
 import org.lds56.mona.core.interpreter.MonaBB;
+import org.lds56.mona.core.runtime.types.MonaNull;
 import org.lds56.mona.core.runtime.types.MonaObject;
 
 /**
@@ -62,6 +63,10 @@ public class Signal {
 
     public static Signal emitCall(MonaObject bb, MonaObject[] args) {
         return new Signal(Type.CALL, null, bb, args);
+    }
+
+    public static Signal emitRet() {
+        return new Signal(Type.RET, null, MonaNull.NIL, null);
     }
 
     public static Signal emitRet(MonaObject obj) {

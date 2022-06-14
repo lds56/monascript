@@ -136,7 +136,7 @@ public enum OpCode {
     // Make Operations
     MAKE_FUNCTION("MAKEF", OpLogic::MakeFunction),
 
-    MAKE_TUPLE("MAKETUPLE"),
+    MAKE_TUPLE("MAKETUPLE", OpLogic::MakeTuple),
 
     MAKE_LIST("MAKELIST"),
 
@@ -147,6 +147,9 @@ public enum OpCode {
     MAKE_STRING("MAKESTR"),
 
     // New Operations
+
+
+    RETURN_NONE("RETNIL", OpLogic::ReturnNone),
 
     RETURN_VALUE("RETVAL", OpLogic::ReturnValue),
 
