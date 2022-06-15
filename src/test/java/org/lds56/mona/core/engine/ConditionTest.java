@@ -8,20 +8,20 @@ import java.util.Map;
 
 /**
  * @Author: Rui Chen
- * @Date: 12 May 2022
+ * @Date: 12 June 2022
  * @Description: This is description.
  */
-public class ArithmeticTest extends CaseTest {
+public class ConditionTest extends CaseTest {
 
-    @ScriptCase(script = "1+1", expected = "2")
+    @ScriptCase(script = "true? 1 : 2", expected = "1")
     public void case1() {}
 
-    @ScriptCase(script = "1*3-(4/5)", expected = "3")
+    @ScriptCase(script = "if false { return -1; } else { return 1; }", expected = "1")
     public void case2() {}
 
-    @ScriptCase(script = "(a+b*c/d-1>3)? a+b : a-b", expected = "-1")
+    @ScriptCase(script = "if a>b { return a; } else { return b; }", expected = "10")
     public Map<String, Object> case3() {
-        return TestUtils.inputOf("a", 1, "b", 2, "c", 3, "d", 4);
+        return TestUtils.inputOf("a", 1, "b", 10);
     }
 
     @Test
