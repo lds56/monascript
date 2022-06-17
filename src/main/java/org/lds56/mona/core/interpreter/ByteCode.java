@@ -82,10 +82,10 @@ public class ByteCode implements Serializable {
         return basicBlocks;
     }
 
-    public void fillMainGlobals(Map<String, MonaObject> constMap) {
+    public void fillMainGlobals(Map<String, MonaObject> globalMap) {
         String[] mainGlobalNames = basicBlocks[Constants.MAIN_BASIC_BLOCK_INDEX].getGlobalNames();
         for (int i=0; i<mainGlobals.length; i++) {
-            mainGlobals[i] = constMap.getOrDefault(mainGlobalNames[i], MonaUndefined.UNDEF);
+            mainGlobals[i] = globalMap.getOrDefault(mainGlobalNames[i], MonaUndefined.UNDEF);
         }
     }
 

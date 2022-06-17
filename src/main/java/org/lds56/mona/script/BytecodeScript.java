@@ -1,6 +1,5 @@
 package org.lds56.mona.script;
 
-import org.lds56.mona.core.exception.MonaRuntimeException;
 import org.lds56.mona.core.interpreter.ByteCode;
 import org.lds56.mona.core.interpreter.VirtualMach;
 import org.lds56.mona.core.interpreter.VirtualMachFactory;
@@ -17,10 +16,20 @@ public class BytecodeScript implements MonaScript {
 
     private final VirtualMach vm;
 
+    private final ByteCode bc;
+
     public BytecodeScript(ByteCode bc) {
-        vm = VirtualMachFactory.createVM();
-        vm.load(bc);
+        this.bc = bc;
+        this.vm = VirtualMachFactory.createVM();
     }
+
+//    public String export() {
+//
+//    }
+//
+//    public static BytecodeScript load(String ) {
+//
+//    }
 
     @Override
     public Object execute() {
@@ -29,9 +38,9 @@ public class BytecodeScript implements MonaScript {
 
     @Override
     public Object execute(Map<String, Object> context) {
-        if (vm.reset()) {
-            return vm.run(context).getValue();
-        }
-        throw new MonaRuntimeException("Failed to reset VM");
+        vm.load(bc);
+        // if (vm.reset()) {
+        return vm.run(context).getValue();
+        // }
     }
 }

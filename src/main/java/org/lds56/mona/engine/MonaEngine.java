@@ -1,5 +1,6 @@
 package org.lds56.mona.engine;
 
+import org.lds56.mona.core.runtime.MonaGlobal;
 import org.lds56.mona.core.script.ScriptComposer;
 import org.lds56.mona.script.MonaExpression;
 import org.lds56.mona.script.MonaScript;
@@ -35,6 +36,9 @@ public class MonaEngine {
     // script cache
     private ConcurrentMap<String, MonaScript> scriptCache;
 
+    // global
+    private MonaGlobal monaGlobal;
+
     public MonaEngine() {
         this(EngineOptions.EMPTY);
     }
@@ -45,7 +49,8 @@ public class MonaEngine {
         this.options = options;
         // script cache
         this.scriptCache = new ConcurrentHashMap<>();
-
+        // global vars
+        this.monaGlobal = new MonaGlobal();
     }
 
     // global mode
@@ -65,12 +70,12 @@ public class MonaEngine {
             if (scriptCache.containsKey(key)) {
                 return scriptCache.get(key);
             }
-            MonaScript script = ScriptComposer.create(code);
+            MonaScript script = ScriptComposer.create(code, monaGlobal.getGlobals());
             scriptCache.put(key, script);
             return script;
 
         } else {
-            return ScriptComposer.create(code);
+            return ScriptComposer.create(code, monaGlobal.getGlobals());
         }
     }
 

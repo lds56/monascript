@@ -15,15 +15,15 @@ public class MonaFunction extends MonaObject implements MonaInvocable {
 
     private final MonaLibFunc innerFunc;
 
-    private MonaFunction(MonaLibFunc innerFunc) {
+    public MonaFunction(MonaLibFunc innerFunc) {
         this.innerFunc = innerFunc;
     }
 
-    public static MonaFunction newFunc(MonaFixedArgFunc innerFunc) {
+    public static MonaFunction newFixedFunc(MonaFixedArgFunc innerFunc) {
         return new MonaFunction(innerFunc);
     }
 
-    public static MonaFunction newFunc(MonaVarArgFunc innerFunc) {
+    public static MonaFunction newVarFunc(MonaVarArgFunc innerFunc) {
         return new MonaFunction(innerFunc);
     }
 
