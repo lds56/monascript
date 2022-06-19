@@ -6,15 +6,11 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.lds56.mona.core.codegen.InterpreterByteCodeGen;
-import org.lds56.mona.core.runtime.functions.MonaFunction;
-import org.lds56.mona.core.runtime.types.MonaObject;
+import org.lds56.mona.core.runtime.MonaGlobal;
 import org.lds56.mona.core.syntax.antlr.MonaLexer;
 import org.lds56.mona.core.syntax.antlr.MonaParser;
 import org.lds56.mona.core.syntax.ast.ASTParserVisitor;
 import org.lds56.mona.core.util.TestUtils;
-import org.lds56.mona.library.java.coll.NewDictFunction;
-import org.lds56.mona.library.java.coll.NewListFunction;
-import org.lds56.mona.library.java.coll.NewSetFunction;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -28,14 +24,16 @@ public class CodeGenTest {
 
     Object interpret(String expr, Map<String, Object> ctx) {
 
-        MonaFunction f1 = MonaFunction.newFunc(new NewListFunction());
-        MonaFunction f2 = MonaFunction.newFunc(new NewDictFunction());
-        MonaFunction f3 = MonaFunction.newFunc(new NewSetFunction());
+//        MonaFunction f1 = MonaFunction.newVarFunc(new NewListFunction());
+//        MonaFunction f2 = MonaFunction.newVarFunc(new NewDictFunction());
+//        MonaFunction f3 = MonaFunction.newVarFunc(new NewSetFunction());
+//
+//        Map<String, MonaObject> m = new HashMap<>();
+//        m.put(f1.getName(), f1);
+//        m.put(f2.getName(), f2);
+//        m.put(f3.getName(), f3);
 
-        Map<String, MonaObject> m = new HashMap<>();
-        m.put(f1.getName(), f1);
-        m.put(f2.getName(), f2);
-        m.put(f3.getName(), f3);
+        MonaGlobal ggg = new MonaGlobal();
 
         CodePointCharStream inputStream = CharStreams.fromString(expr);
         MonaLexer lexer = new MonaLexer(inputStream);
@@ -48,7 +46,7 @@ public class CodeGenTest {
 
         ByteCodeBlock mainBlock = vistor.visit(parser.script());
         ByteCode bc = codegen.generate(mainBlock);
-        bc.fillMainGlobals(m);
+        bc.fillMainGlobals(ggg.getModule());
 
         // print
         for (BasicBlock bb : bc.getBasicBlocks()) {

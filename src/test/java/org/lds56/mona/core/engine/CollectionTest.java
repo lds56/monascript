@@ -21,7 +21,6 @@ public class CollectionTest extends ScriptTest {
         Assertions.assertEquals(o, 5);
     }
 
-    // TODO: implement +=
     @Test
     public void testSumList() {
 

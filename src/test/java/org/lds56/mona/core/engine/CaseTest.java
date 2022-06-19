@@ -3,10 +3,13 @@ package org.lds56.mona.core.engine;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.lds56.mona.core.util.ScriptCase;
+import org.lds56.mona.engine.EngineOptions;
 import org.lds56.mona.engine.MonaEngine;
 
 import java.lang.reflect.Method;
 import java.util.Map;
+
+import static org.lds56.mona.engine.EngineOption.IR_CODE_TRACE_STACK_PRINT_SWITCH;
 
 /**
  * @Author: Rui Chen
@@ -15,7 +18,9 @@ import java.util.Map;
  */
 public class CaseTest {
 
-    protected MonaEngine engine = new MonaEngine();
+    protected MonaEngine engine = new MonaEngine(
+            EngineOptions.setUp()
+                         .setOption(IR_CODE_TRACE_STACK_PRINT_SWITCH, false));
 
 //    @ScriptCase(script="1+1", expected="2")
 //    private Map<String, Object> inputs1() {
