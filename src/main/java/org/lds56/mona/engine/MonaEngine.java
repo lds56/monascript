@@ -70,12 +70,12 @@ public class MonaEngine {
             if (scriptCache.containsKey(key)) {
                 return scriptCache.get(key);
             }
-            MonaScript script = ScriptComposer.create(code, monaGlobal.getGlobals());
+            MonaScript script = ScriptComposer.create(code, monaGlobal.getModule());
             scriptCache.put(key, script);
             return script;
 
         } else {
-            return ScriptComposer.create(code, monaGlobal.getGlobals());
+            return ScriptComposer.create(code, monaGlobal.getModule());
         }
     }
 

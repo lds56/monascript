@@ -113,34 +113,38 @@ public class InterpreterByteCodeGen implements AbastractCodeGen<ByteCodeBlock> {
     @Override
     public ByteCodeBlock onList(List<ByteCodeBlock> l) {
         return ByteCodeBlock.build()
-                            .append(InstructionExt.of(OpCode.LOAD_GLOBAL, findMetadataVar("coll.list").index))
+                            .append(InstructionExt.of(OpCode.LOAD_GLOBAL, findMetadataVar("coll").index))
+                            .append(InstructionExt.of(OpCode.LOAD_CONSTANT, metaStack.peek().getConstIndex(MonaString.valueOf("list"))))
                             .merge(l)
-                            .append(InstructionExt.of(OpCode.CALL_OBJECT, l.size()));
+                            .append(InstructionExt.of(OpCode.CALL_METHOD, l.size()));
     }
 
     @Override
     public ByteCodeBlock onSet(List<ByteCodeBlock> l) {
         return ByteCodeBlock.build()
-                            .append(InstructionExt.of(OpCode.LOAD_GLOBAL, findMetadataVar("coll.set").index))
+                            .append(InstructionExt.of(OpCode.LOAD_GLOBAL, findMetadataVar("coll").index))
+                            .append(InstructionExt.of(OpCode.LOAD_CONSTANT, metaStack.peek().getConstIndex(MonaString.valueOf("list"))))
                             .merge(l)
-                            .append(InstructionExt.of(OpCode.CALL_OBJECT, l.size()));
+                            .append(InstructionExt.of(OpCode.CALL_METHOD, l.size()));
     }
 
     @Override
     public ByteCodeBlock onMap(List<ByteCodeBlock> kv) {
         return ByteCodeBlock.build()
-                            .append(InstructionExt.of(OpCode.LOAD_GLOBAL, findMetadataVar("coll.dict").index))
+                            .append(InstructionExt.of(OpCode.LOAD_GLOBAL, findMetadataVar("coll").index))
+                            .append(InstructionExt.of(OpCode.LOAD_CONSTANT, metaStack.peek().getConstIndex(MonaString.valueOf("dict"))))
                             .merge(kv)
-                            .append(InstructionExt.of(OpCode.CALL_OBJECT, kv.size()));
+                            .append(InstructionExt.of(OpCode.CALL_METHOD, kv.size()));
     }
 
     @Override
     public ByteCodeBlock onRange(int start, int end) {
         return ByteCodeBlock.build()
-                            .append(InstructionExt.of(OpCode.LOAD_GLOBAL, findMetadataVar("coll.range").index))
+                            .append(InstructionExt.of(OpCode.LOAD_GLOBAL, findMetadataVar("coll").index))
+                            .append(InstructionExt.of(OpCode.LOAD_CONSTANT, metaStack.peek().getConstIndex(MonaString.valueOf("range"))))
                             .merge(onInteger(start))
                             .merge(onInteger(end))
-                            .append(InstructionExt.of(OpCode.CALL_OBJECT, 2));
+                            .append(InstructionExt.of(OpCode.CALL_METHOD, 2));
     }
 
     @Override

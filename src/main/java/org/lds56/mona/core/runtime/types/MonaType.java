@@ -18,7 +18,9 @@ public enum MonaType implements Serializable {
     Undefined,
     Collection,
     Iter,
-    Function
+    Function,
+    Error,
+    Module,
     ;
 
     public static boolean isNull(MonaObject a) {

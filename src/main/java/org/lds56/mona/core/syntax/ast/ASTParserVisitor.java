@@ -26,7 +26,8 @@ public class ASTParserVisitor<T> extends MonaParserBaseVisitor<T> {
 
     @Override
     public T visitStringLiteral(StringLiteralContext ctx) {
-        return codeGen.onString(ctx.STRING().getText());
+        String text = ctx.STRING().getText().substring(1, ctx.STRING().getText().length() - 1).replace("\\", "\\\\");
+        return codeGen.onString(text);
     }
 
     @Override
@@ -226,7 +227,7 @@ public class ASTParserVisitor<T> extends MonaParserBaseVisitor<T> {
 
     // decl & assignment
     @Override
-    public T visitVarAssStat(VarAssStatContext ctx) {  // TODO: change the name `VariableStatContext`
+    public T visitVarAssStat(VarAssStatContext ctx) {
         if (ctx.ids().ID().size() == 1) {
             return codeGen.onDefinition(ctx.ids().ID(0).getText(), visit(ctx.expr()));
         }
@@ -236,7 +237,7 @@ public class ASTParserVisitor<T> extends MonaParserBaseVisitor<T> {
     }
 
     @Override
-    public T visitFuncAssStat(FuncAssStatContext ctx) {  // TODO: change the name `VariableStatContext`
+    public T visitFuncAssStat(FuncAssStatContext ctx) {
         return codeGen.onDefinition(ctx.ID().getText(), visit(ctx.anonymous_func()));
     }
 

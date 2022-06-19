@@ -340,7 +340,7 @@ public class OpLogic {
     }
 
     public static Signal CallMethod(Context context, Integer argNum) {
-        Object[] args = context.popArgsUnpacked(argNum);
+        MonaObject[] args = context.popArgs(argNum);
         MonaObject methodName = context.popOperand();
         MonaAccessible obj = MonaTrait.cast(context.popOperand(), MonaAccessible.class);
         context.pushOperand(obj.callMethod(methodName.stringValue(), args));

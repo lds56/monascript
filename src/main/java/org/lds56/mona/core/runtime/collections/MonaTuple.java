@@ -51,8 +51,7 @@ public class MonaTuple extends MonaObject implements MonaIterable, MonaIndexable
 
     @Override
     public Iterator<?> iterator() {
-        // TODO
-        return null;
+        return Arrays.asList(value).iterator();
     }
 
     @Override

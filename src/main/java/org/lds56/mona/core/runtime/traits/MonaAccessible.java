@@ -11,5 +11,5 @@ public interface MonaAccessible {
 
     MonaObject getProperty(String name);
 
-    MonaObject callMethod(String name, Object... args);
+    MonaObject callMethod(String name, MonaObject... args);
 }

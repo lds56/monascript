@@ -1,12 +1,11 @@
 package org.lds56.mona.core.interpreter;
 
 import org.lds56.mona.core.exception.InterpretErrorException;
+import org.lds56.mona.core.runtime.functions.MonaModule;
 import org.lds56.mona.core.runtime.types.MonaObject;
-import org.lds56.mona.core.runtime.types.MonaUndefined;
 
 import java.io.InputStream;
 import java.io.Serializable;
-import java.util.Map;
 
 /**
  *
@@ -82,10 +81,10 @@ public class ByteCode implements Serializable {
         return basicBlocks;
     }
 
-    public void fillMainGlobals(Map<String, MonaObject> globalMap) {
+    public void fillMainGlobals(MonaModule globalMod) {
         String[] mainGlobalNames = basicBlocks[Constants.MAIN_BASIC_BLOCK_INDEX].getGlobalNames();
         for (int i=0; i<mainGlobals.length; i++) {
-            mainGlobals[i] = globalMap.getOrDefault(mainGlobalNames[i], MonaUndefined.UNDEF);
+            mainGlobals[i] = globalMod.getMember(mainGlobalNames[i]);
         }
     }
 

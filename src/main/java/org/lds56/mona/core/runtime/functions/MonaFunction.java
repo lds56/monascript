@@ -27,8 +27,12 @@ public class MonaFunction extends MonaObject implements MonaInvocable {
         return new MonaFunction(innerFunc);
     }
 
-    public String getName() {
+    public String getFullName() {
         return this.innerFunc.getPackage() + "." + this.innerFunc.getName();
+    }
+
+    public String getName() {
+        return this.innerFunc.getName();
     }
 
     @Override
