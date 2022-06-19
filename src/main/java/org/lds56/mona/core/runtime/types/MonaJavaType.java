@@ -127,81 +127,6 @@ public class MonaJavaType extends MonaObject implements MonaHashable, MonaAccess
         return getNValue().bigDecValue();
     }
 
-    // TODO: support java collection
-//    /**
-//     * Access array or list element
-//     *
-//     * @param indexObject
-//     * @return
-//     */
-//    @Override
-//    public MonaObject getElement(final MonaObject indexObject) {
-//
-//        final Object thisValue = getValue();
-//        final Object indexValue = indexObject.getValue();
-//
-//        if (Objects.isNull(thisValue)) {
-//            throw new ContextAccessException("Cannot get element from null value");
-//        }
-//
-//        if (Objects.isNull(indexValue)) {
-//            throw new ContextAccessException("Cannot use null index in collection");
-//        }
-//
-//        Class<?> clazz = thisValue.getClass();
-//
-//        Object result;
-//        if (Map.class.isAssignableFrom(clazz)) {
-//            result = ((Map) thisValue).get(indexValue);
-//        }
-//        else if (List.class.isAssignableFrom(clazz)) {
-//            if (indexValue instanceof Number) {
-//                result = ((List) thisValue).get(((Number) indexValue).intValue());
-//            } else {
-//                throw new InvalidArgumentException("Integer type expected when get element from list");
-//            }
-//        }
-//        else if (Set.class.isAssignableFrom(clazz)) {
-//            result = ((Set) thisValue).contains(indexValue)? indexValue : null;
-//        }
-//        else if (clazz.isArray()) {
-//            if (indexValue instanceof Number) {
-//                result = Array.get(thisValue, ((Number) indexValue).intValue());
-//            } else {
-//                throw new InvalidArgumentException("Integer type expected when get element from list");
-//            }
-//        }
-//        else {
-//            throw new ContextAccessException("Cannot get element from unsupported type, list or map expected");
-//        }
-//
-//        return result != null ? MonaObject.wrap(result) : MonaNull.NIL;
-//    }
-//
-//    // TODO: return mona object
-//    @Override
-//    public Iterator<?> iterator() {
-//        final Object value = getValue();
-//        if (Objects.isNull(value)) {
-//            throw new ContextAccessException("Cannot get an iterator from null value");
-//        }
-//
-//        if (value.getClass().isArray()) {
-//            return Arrays.asList((Object[])value).iterator();
-//        }
-//        else if (value instanceof Collection) {
-//            return ((Collection) value).iterator();
-//        }
-//        else {
-//            throw new ContextAccessException("No iterable object");
-//        }
-//    }
-//
-//    @Override
-//    public MonaIter iter() {
-//        return new MonaIter(iterator());
-//    }
-
     @Override
     public String toString() {
         return stringValue();
@@ -224,9 +149,13 @@ public class MonaJavaType extends MonaObject implements MonaHashable, MonaAccess
     }
 
     @Override
-    public MonaObject callMethod(String methodName, Object... args) {
+    public MonaObject callMethod(String methodName, MonaObject... args) {
         try {
-            return wrap(NeoMethodUtils.getMethod(this.getValue().getClass(), methodName, args).invoke(this.getValue(), args));
+            Object[] rawArgs = new Object[args.length];
+            for (int i=0; i< rawArgs.length; i++) {
+                rawArgs[i] = args[i].getValue();
+            }
+            return wrap(NeoMethodUtils.getMethod(this.getValue().getClass(), methodName, rawArgs).invoke(this.getValue(), rawArgs));
         } catch (FunctionNotFoundException e) {
             return MonaUndefined.UNDEF;
         } catch (IllegalAccessException | NoSuchMethodException e) {
@@ -243,9 +172,7 @@ public class MonaJavaType extends MonaObject implements MonaHashable, MonaAccess
         }
 
         if (value.getClass().isArray()) {
-            // TODO: use tuple iterator()
-            // return Arrays.asList((Object[])value).iterator();
-            return null;
+            return Arrays.asList((Object[])value).iterator();
         }
         else if (value instanceof Collection) {
             return ((Collection) value).iterator();
