@@ -271,10 +271,16 @@ public class ASTParserVisitor<T> extends MonaParserBaseVisitor<T> {
     }
 
     @Override
-    public T visitStatement(StatementContext ctx) {
+    public T visitScriptStat(ScriptStatContext ctx) {
+        ctx.module_stat().forEach(this::visit);
         return ctx.stat().stream()
                   .map(this::visit)
                   .reduce(codeGen.onEmpty(), (acc, e) -> codeGen.onComma(acc, e));
+    }
+
+    @Override
+    public T visitImportStat(ImportStatContext ctx) {
+        return codeGen.onImport(ctx.ID().stream().map(ParseTree::getText).collect(Collectors.toList()));
     }
 
     @Override

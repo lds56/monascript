@@ -6,9 +6,12 @@ options {
 
 script
     : expr EOF # expression
-    | stat*    # statement
+    | module_stat* stat*    # scriptStat
     ;
 
+module_stat
+    : IMPORT ID (DOT ID)* SEMI_COLON    # importStat
+    ;
 
 stat
     : SEMI_COLON              # emptyStat

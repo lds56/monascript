@@ -5,6 +5,7 @@ channels { ERROR }
 /// keywords
 
 LET         : 'let';
+IMPORT      : 'import';
 
 RETURN      : 'return';
 CONTINUE    : 'continue';
