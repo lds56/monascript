@@ -3,4 +3,15 @@
 </p>
 <br>
 <br>
-モナ script desu!
+
+# Workflow
+
+Mona Script ➡️ Mona IR 💿 JVM ➡️ Result💡
+
+# Features 
+WIP👷
+
+# RoadMap
+[ROADMAP](./ROADMAP.md)
+# IR Sheet
+[Sheet](./doc/ir-code-sheet.md)
