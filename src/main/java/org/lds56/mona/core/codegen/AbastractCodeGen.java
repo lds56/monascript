@@ -33,7 +33,7 @@ public interface AbastractCodeGen<T> {
 
     T onRange(int start, int end);
 
-    T onIdentity(String id);
+    T onIdentifier(String id);
 
     T onIndex(T obj, T index);
 
@@ -132,6 +132,8 @@ public interface AbastractCodeGen<T> {
     T onIterUnpacked(List<String> iterNames);
 
     T onForIn(T iter, T list, T loopBody);
+
+    T onImport(List<String> moduleNames);
 
     // T onLambda(List<String> argNames, dx)
 

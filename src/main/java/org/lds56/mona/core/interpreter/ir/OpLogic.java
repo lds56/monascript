@@ -206,6 +206,12 @@ public class OpLogic {
         return Signal.emitNext();
     }
 
+    public static Signal LoadStatic(Context context, Integer index) {
+        MonaObject value = context.findStatic(index);
+        context.pushOperand(value);
+        return Signal.emitNext();
+    }
+
     public static Signal LoadConst(Context context, Integer index) {
         MonaObject value = context.block().loadConst(index);
         context.pushOperand(value);
@@ -221,6 +227,12 @@ public class OpLogic {
     public static Signal StoreGlobal(Context context, Integer index) {
         MonaObject value = context.popOperand();
         context.setGlobal(-index, value);
+        return Signal.emitNext();
+    }
+
+    public static Signal StoreStatic(Context context, Integer index) {
+        MonaObject value = context.popOperand();
+        context.setStatic(index, value);
         return Signal.emitNext();
     }
 

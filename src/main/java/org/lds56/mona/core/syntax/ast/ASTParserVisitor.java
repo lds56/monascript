@@ -79,8 +79,8 @@ public class ASTParserVisitor<T> extends MonaParserBaseVisitor<T> {
 
     // access
     @Override
-    public T visitIdentifierExpr(IdentifierExprContext ctx) {
-        return codeGen.onIdentity(ctx.identity().getText());
+    public T visitIdentifier(IdentifierContext ctx) {
+        return codeGen.onIdentifier(ctx.ID().getText());
     }
 
     @Override

@@ -6,7 +6,6 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.lds56.mona.core.codegen.InterpreterByteCodeGen;
 import org.lds56.mona.core.interpreter.ByteCode;
 import org.lds56.mona.core.interpreter.ByteCodeBlock;
-import org.lds56.mona.core.runtime.functions.MonaModule;
 import org.lds56.mona.core.syntax.antlr.MonaLexer;
 import org.lds56.mona.core.syntax.antlr.MonaParser;
 import org.lds56.mona.core.syntax.ast.ASTParserVisitor;
@@ -22,7 +21,7 @@ import org.lds56.mona.script.MonaScript;
  */
 public class ScriptComposer {
 
-    public static MonaScript create(String code, MonaModule globalMod) {
+    public static MonaScript create(String code) {
 
         CodePointCharStream inputStream = CharStreams.fromString(code);
         MonaLexer lexer = new MonaLexer(inputStream);
@@ -32,7 +31,7 @@ public class ScriptComposer {
 
         switch (MonaEngine.getEngineMode().getChoice(EngineOption.SCRIPT_EXECUTION_MODE)) {
             case BYTECODE_SCRIPT:
-                return byyyyyte(parser, globalMod);
+                return byyyyyte(parser);
             case EVAL_EXPRESSION:
                 return null;
             default:
@@ -41,14 +40,14 @@ public class ScriptComposer {
 
     }
 
-    private static MonaScript byyyyyte(MonaParser parser, MonaModule globalMod) {
+    private static MonaScript byyyyyte(MonaParser parser) {
 
         InterpreterByteCodeGen codegen = new InterpreterByteCodeGen();
         ASTParserVisitor<ByteCodeBlock> vistor = new ASTParserVisitor<>(codegen);
 
         ByteCodeBlock mainBlock = vistor.visit(parser.script());
         ByteCode bc = codegen.generate(mainBlock);
-        bc.fillMainGlobals(globalMod);
+        // bc.fillStatic(globalMod);
 
         return new BytecodeScript(bc);
     }

@@ -104,6 +104,8 @@ public enum OpCode {
 
     LOAD_GLOBAL("LOADG", OpLogic::LoadGlobal),
 
+    LOAD_STATIC("LOADS", OpLogic::LoadStatic),
+
     LOAD_CONSTANT("LOADC", OpLogic::LoadConst),
 
     // LOAD_METHOD("LOADM"),
@@ -111,6 +113,8 @@ public enum OpCode {
     STORE_LOCAL("STOREL", OpLogic::StoreLocal),
 
     STORE_GLOBAL("STOREG", OpLogic::StoreGlobal),
+
+    STORE_STATIC("STORES", OpLogic::StoreStatic),
 
     // Function Operations
     CALL_FUNCTION("CALLF", OpLogic::CallFunction),

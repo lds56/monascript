@@ -1,8 +1,10 @@
 package org.lds56.mona.core.codegen;
 
 import org.lds56.mona.core.exception.SyntaxNotSupportedException;
+import org.lds56.mona.core.exception.VariableNotFoundException;
 import org.lds56.mona.core.interpreter.*;
 import org.lds56.mona.core.interpreter.ir.OpCode;
+import org.lds56.mona.core.runtime.MonaStatic;
 import org.lds56.mona.core.runtime.types.*;
 
 import java.util.*;
@@ -20,6 +22,12 @@ public class InterpreterByteCodeGen implements AbastractCodeGen<ByteCodeBlock> {
     private final List<BasicBlock> bbList = new ArrayList<>();
 
     private final List<String> globals = new ArrayList<>();
+
+    private final Set<List<String>> moduleNames = new HashSet<>();
+
+    // $1, $2, ... $256 | $a $b ...
+    private final List<String> staticNames = new ArrayList<>();
+    private final List<MonaObject> staticValues = new ArrayList<>();
 
     public InterpreterByteCodeGen() {
         openBlock(Constants.MAIN_BASIC_BLOCK_NAME);
@@ -48,7 +56,11 @@ public class InterpreterByteCodeGen implements AbastractCodeGen<ByteCodeBlock> {
             bb[i].setStartAddress(startAddr);
             startAddr += bb[i].instrCount();
         }
-        return new ByteCode(bb);
+        String[] sn = new String[staticNames.size()];
+        staticNames.toArray(sn);
+        MonaObject[] sv = new MonaObject[staticValues.size()];
+        staticValues.toArray(sv);
+        return ByteCode.load(bb, new StaticArea(sn, sv));
     }
 
     private ByteCodeMetadata.Var findMetadataVar(String varName) {
@@ -90,6 +102,49 @@ public class InterpreterByteCodeGen implements AbastractCodeGen<ByteCodeBlock> {
         }
         return metaVar;
     }
+//
+//    private int findStaticIndex(String globalName) throws VariableNotFoundException {
+//        int idx = globalNames.indexOf(globalName);
+//        if (idx < 0) {
+//            throw new VariableNotFoundException("Global variable not found");
+//        }
+//        return idx;
+//    }
+//
+//    private int findVarIndex(String varName) {
+//        if (!metaStack.isEmpty()) {
+//            for (ByteCodeMetadata metadata : metaStack) {
+//                int idx = metadata.getVarNameIndex(varName);
+//                if (idx >= 0) {
+//                    return idx;
+//                }
+//            }
+//        }
+//        throw new VariableNotFoundException("Local variable not found");
+//    }
+
+    private int findStaticIndex(String inputName) {
+
+        int idx = staticNames.indexOf(inputName);
+        if (idx < 0) {
+            // input
+            if (inputName.startsWith("$")) {
+                staticValues.add(MonaNull.NIL);
+
+            } else {
+                // global function
+                MonaObject obj = MonaStatic.get(inputName);
+                if (MonaType.isUndefined(obj)) {
+                    throw new VariableNotFoundException("Static variable not found");
+                }
+                staticValues.add(obj);
+            }
+            staticNames.add(inputName);
+            return staticNames.size() - 1;
+        }
+
+        return idx;
+    }
 
     @Override
     public ByteCodeBlock onEmpty() {
@@ -113,7 +168,7 @@ public class InterpreterByteCodeGen implements AbastractCodeGen<ByteCodeBlock> {
     @Override
     public ByteCodeBlock onList(List<ByteCodeBlock> l) {
         return ByteCodeBlock.build()
-                            .append(InstructionExt.of(OpCode.LOAD_GLOBAL, findMetadataVar("coll").index))
+                            .append(InstructionExt.of(OpCode.LOAD_STATIC, findStaticIndex("coll")))
                             .append(InstructionExt.of(OpCode.LOAD_CONSTANT, metaStack.peek().getConstIndex(MonaString.valueOf("list"))))
                             .merge(l)
                             .append(InstructionExt.of(OpCode.CALL_METHOD, l.size()));
@@ -122,8 +177,8 @@ public class InterpreterByteCodeGen implements AbastractCodeGen<ByteCodeBlock> {
     @Override
     public ByteCodeBlock onSet(List<ByteCodeBlock> l) {
         return ByteCodeBlock.build()
-                            .append(InstructionExt.of(OpCode.LOAD_GLOBAL, findMetadataVar("coll").index))
-                            .append(InstructionExt.of(OpCode.LOAD_CONSTANT, metaStack.peek().getConstIndex(MonaString.valueOf("list"))))
+                            .append(InstructionExt.of(OpCode.LOAD_STATIC, findStaticIndex("coll")))
+                            .append(InstructionExt.of(OpCode.LOAD_CONSTANT, metaStack.peek().getConstIndex(MonaString.valueOf("set"))))
                             .merge(l)
                             .append(InstructionExt.of(OpCode.CALL_METHOD, l.size()));
     }
@@ -131,7 +186,7 @@ public class InterpreterByteCodeGen implements AbastractCodeGen<ByteCodeBlock> {
     @Override
     public ByteCodeBlock onMap(List<ByteCodeBlock> kv) {
         return ByteCodeBlock.build()
-                            .append(InstructionExt.of(OpCode.LOAD_GLOBAL, findMetadataVar("coll").index))
+                            .append(InstructionExt.of(OpCode.LOAD_STATIC, findStaticIndex("coll")))
                             .append(InstructionExt.of(OpCode.LOAD_CONSTANT, metaStack.peek().getConstIndex(MonaString.valueOf("dict"))))
                             .merge(kv)
                             .append(InstructionExt.of(OpCode.CALL_METHOD, kv.size()));
@@ -140,13 +195,12 @@ public class InterpreterByteCodeGen implements AbastractCodeGen<ByteCodeBlock> {
     @Override
     public ByteCodeBlock onRange(int start, int end) {
         return ByteCodeBlock.build()
-                            .append(InstructionExt.of(OpCode.LOAD_GLOBAL, findMetadataVar("coll").index))
+                            .append(InstructionExt.of(OpCode.LOAD_STATIC, findStaticIndex("coll")))
                             .append(InstructionExt.of(OpCode.LOAD_CONSTANT, metaStack.peek().getConstIndex(MonaString.valueOf("range"))))
                             .merge(onInteger(start))
                             .merge(onInteger(end))
                             .append(InstructionExt.of(OpCode.CALL_METHOD, 2));
     }
-
     @Override
     public ByteCodeBlock onInteger(int i) {
         return ByteCodeBlock.build(
@@ -183,10 +237,17 @@ public class InterpreterByteCodeGen implements AbastractCodeGen<ByteCodeBlock> {
     }
 
     @Override
-    public ByteCodeBlock onIdentity(String id) {
-        ByteCodeMetadata.Var metaVar = findMetadataVar(id);
-        return ByteCodeBlock.build(
-                InstructionExt.of(metaVar.isLocal? OpCode.LOAD_LOCAL : OpCode.LOAD_GLOBAL, metaVar.index));
+    public ByteCodeBlock onIdentifier(String id) {
+        // input case
+        try {
+            return ByteCodeBlock.build(InstructionExt.of(OpCode.LOAD_STATIC, findStaticIndex(id)));
+        } catch (VariableNotFoundException e) {
+            // normal case
+            ByteCodeMetadata.Var metaVar = findMetadataVar(id);
+            return ByteCodeBlock.build(InstructionExt.of(
+                    metaVar.isLocal? OpCode.LOAD_LOCAL : OpCode.LOAD_GLOBAL,
+                    metaVar.index));
+        }
     }
 
     @Override
@@ -370,52 +431,27 @@ public class InterpreterByteCodeGen implements AbastractCodeGen<ByteCodeBlock> {
 
     @Override
     public ByteCodeBlock onSelfAdd(String name, ByteCodeBlock value) {
-        ByteCodeMetadata.Var metaVar = findMetadataVar(name);
-        return ByteCodeBlock.build()
-                .append(InstructionExt.of(OpCode.LOAD_LOCAL, metaVar.index))
-                .merge(value)
-                .append(InstructionExt.of(OpCode.INPLACE_ADD))
-                .append(InstructionExt.of(OpCode.STORE_LOCAL, metaVar.index));
+        return onSelfAssignment(name, value, OpCode.INPLACE_ADD);
     }
 
     @Override
     public ByteCodeBlock onSelfSub(String name, ByteCodeBlock value) {
-        ByteCodeMetadata.Var metaVar = findMetadataVar(name);
-        return ByteCodeBlock.build()
-                            .append(InstructionExt.of(OpCode.LOAD_LOCAL, metaVar.index))
-                            .merge(value)
-                            .append(InstructionExt.of(OpCode.INPLACE_SUBSTRACT))
-                            .append(InstructionExt.of(OpCode.STORE_LOCAL, metaVar.index));
+        return onSelfAssignment(name, value, OpCode.INPLACE_SUBSTRACT);
     }
 
     @Override
     public ByteCodeBlock onSelfMul(String name, ByteCodeBlock value) {
-        ByteCodeMetadata.Var metaVar = findMetadataVar(name);
-        return ByteCodeBlock.build()
-                            .append(InstructionExt.of(OpCode.LOAD_LOCAL, metaVar.index))
-                            .merge(value)
-                            .append(InstructionExt.of(OpCode.INPLACE_MULTIPLY))
-                            .append(InstructionExt.of(OpCode.STORE_LOCAL, metaVar.index));
+        return onSelfAssignment(name, value, OpCode.INPLACE_MULTIPLY);
     }
 
     @Override
     public ByteCodeBlock onSelfDiv(String name, ByteCodeBlock value) {
-        ByteCodeMetadata.Var metaVar = findMetadataVar(name);
-        return ByteCodeBlock.build()
-                            .append(InstructionExt.of(OpCode.LOAD_LOCAL, metaVar.index))
-                            .merge(value)
-                            .append(InstructionExt.of(OpCode.INPLACE_DIVIDE))
-                            .append(InstructionExt.of(OpCode.STORE_LOCAL, metaVar.index));
+        return onSelfAssignment(name, value, OpCode.INPLACE_DIVIDE);
     }
 
     @Override
     public ByteCodeBlock onSelfMod(String name, ByteCodeBlock value) {
-        ByteCodeMetadata.Var metaVar = findMetadataVar(name);
-        return ByteCodeBlock.build()
-                            .append(InstructionExt.of(OpCode.LOAD_LOCAL, metaVar.index))
-                            .merge(value)
-                            .append(InstructionExt.of(OpCode.INPLACE_MODULO))
-                            .append(InstructionExt.of(OpCode.STORE_LOCAL, metaVar.index));
+        return onSelfAssignment(name, value, OpCode.INPLACE_MODULO);
     }
 
     @Override
@@ -427,10 +463,19 @@ public class InterpreterByteCodeGen implements AbastractCodeGen<ByteCodeBlock> {
 
     @Override
     public ByteCodeBlock onAssignment(String name, ByteCodeBlock value) {
-        ByteCodeMetadata.Var metaVar = findMetadataVar(name);
-        return ByteCodeBlock.build()
-                            .merge(value)
-                            .append(InstructionExt.of(metaVar.isLocal? OpCode.STORE_LOCAL : OpCode.STORE_GLOBAL, metaVar.index));
+        try {
+            int idx = findStaticIndex(name);
+            return ByteCodeBlock.build()
+                                .merge(value)
+                                .append(InstructionExt.of(OpCode.STORE_STATIC, idx));
+        } catch (VariableNotFoundException e) {
+            ByteCodeMetadata.Var metaVar = findMetadataVar(name);
+            return ByteCodeBlock.build()
+                                .merge(value)
+                                .append(InstructionExt.of(
+                                        metaVar.isLocal? OpCode.STORE_LOCAL : OpCode.STORE_GLOBAL,
+                                        metaVar.index));
+        }
     }
 
     @Override
@@ -594,6 +639,33 @@ public class InterpreterByteCodeGen implements AbastractCodeGen<ByteCodeBlock> {
                             .append(InstructionExt.labelOf(metaStack.peek().exitLoopLabel()));
     }
 
+    @Override
+    public ByteCodeBlock onImport(List<String> modulePath) {
+        moduleNames.add(modulePath);
+        return null;
+    }
+
+    private ByteCodeBlock onSelfAssignment(String name, ByteCodeBlock value, OpCode opcode) {
+        try {
+            int idx = findStaticIndex(name);
+            return ByteCodeBlock.build()
+                                .append(InstructionExt.of(OpCode.LOAD_STATIC, idx))
+                                .merge(value)
+                                .append(InstructionExt.of(opcode))
+                                .append(InstructionExt.of(OpCode.STORE_STATIC, idx));
+        } catch (VariableNotFoundException e) {
+            ByteCodeMetadata.Var metaVar = findMetadataVar(name);
+            return ByteCodeBlock.build()
+                                .append(InstructionExt.of(
+                                        metaVar.isLocal? OpCode.LOAD_LOCAL : OpCode.LOAD_GLOBAL,
+                                        metaVar.index))
+                                .merge(value)
+                                .append(InstructionExt.of(opcode))
+                                .append(InstructionExt.of(
+                                        metaVar.isLocal? OpCode.STORE_LOCAL : OpCode.STORE_GLOBAL,
+                                        metaVar.index));
+        }
+    }
 
 }
 

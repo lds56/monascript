@@ -3,6 +3,7 @@ package org.lds56.mona.core.runtime;
 import org.lds56.mona.core.runtime.functions.MonaFunction;
 import org.lds56.mona.core.runtime.functions.MonaLibFunc;
 import org.lds56.mona.core.runtime.functions.MonaModule;
+import org.lds56.mona.core.runtime.types.MonaObject;
 import org.lds56.mona.library.java.coll.NewDictFunction;
 import org.lds56.mona.library.java.coll.NewListFunction;
 import org.lds56.mona.library.java.coll.NewRangeFunction;
@@ -18,35 +19,51 @@ import java.util.Set;
  * @Date: 16 Jun 2022
  * @Description: This is description.
  */
-public class MonaGlobal {
+public class MonaStatic {
 
-    private final MonaModule module = new MonaModule();
+//    private static class GlobalObj {
+//        MonaObject   obj;
+//        String       name;
+//        List<String> path;
+//    }
 
-    private final Set<String> packages = new HashSet<>();
-
-    public MonaModule getModule() {
-        return module;
-    }
-
-    public boolean isPackage(String name) {
-        return packages.contains(name);
-    }
-
-    public MonaGlobal() {
+    static {
+        topModule = new MonaModule();
+        packages = new HashSet<>();
         addLibFunctions();
     }
 
-    // TODO: optimize
-    private void addModule(String name, MonaModule mod) {
-        module.addMember(name, mod);
+    private final static MonaModule topModule;
+
+    private final static Set<String> packages;
+
+    // private GlobalObj[] globals;
+
+    public static MonaModule getModule() {
+        return topModule;
     }
 
-    private void addLibFunc(MonaModule mod, MonaLibFunc func) {
+    public static boolean isPackage(String name) {
+        return packages.contains(name);
+    }
+
+    public MonaStatic() {}
+
+    public static MonaObject get(String name) {
+        return topModule.getMember(name);
+    }
+
+    // TODO: optimize
+    private static void addModule(String name, MonaModule mod) {
+        topModule.addMember(name, mod);
+    }
+
+    private static void addLibFunc(MonaModule mod, MonaLibFunc func) {
         MonaFunction monaFunc = new MonaFunction(func);
         mod.addMember(monaFunc.getName(), monaFunc);
     }
 
-    private void addLibFunctions() {
+    private static void addLibFunctions() {
 
         MonaModule collMod = new MonaModule();
         addLibFunc(collMod, new NewListFunction());

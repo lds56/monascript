@@ -2,7 +2,6 @@ package org.lds56.mona.core.interpreter;
 
 import org.lds56.mona.core.exception.InterpretErrorException;
 import org.lds56.mona.core.runtime.functions.MonaModule;
-import org.lds56.mona.core.runtime.types.MonaObject;
 
 import java.io.InputStream;
 import java.io.Serializable;
@@ -33,13 +32,16 @@ import java.io.Serializable;
  */
 public class ByteCode implements Serializable {
 
-    private MonaObject[] mainGlobals;
+    private StaticArea staticArea;
+
+    // private MonaObject[] mainGlobals;
 
     private final BasicBlock[] basicBlocks;
 
-    public ByteCode(BasicBlock[] basicBlocks) {
+    public ByteCode(BasicBlock[] basicBlocks, StaticArea staticArea) {
         this.basicBlocks = basicBlocks;
-        this.mainGlobals = new MonaObject[basicBlocks[Constants.MAIN_BASIC_BLOCK_INDEX].getGlobalNum()];
+        // this.mainGlobals = new MonaObject[basicBlocks[Constants.MAIN_BASIC_BLOCK_INDEX].getGlobalNum()];
+        this.staticArea = staticArea;
     }
 
 //    public ByteCode load(String codeStr) {
@@ -62,8 +64,12 @@ public class ByteCode implements Serializable {
         return null;
     }
 
+    public static ByteCode load(BasicBlock[] basicBlocks, StaticArea staticArea) {
+        return new ByteCode(basicBlocks, staticArea);
+    }
+
     public static ByteCode load(BasicBlock[] basicBlocks) {
-        return new ByteCode(basicBlocks);
+        return new ByteCode(basicBlocks, new StaticArea());
     }
 
     public BasicBlock getBlock(int index) {
@@ -81,15 +87,20 @@ public class ByteCode implements Serializable {
         return basicBlocks;
     }
 
-    public void fillMainGlobals(MonaModule globalMod) {
-        String[] mainGlobalNames = basicBlocks[Constants.MAIN_BASIC_BLOCK_INDEX].getGlobalNames();
-        for (int i=0; i<mainGlobals.length; i++) {
-            mainGlobals[i] = globalMod.getMember(mainGlobalNames[i]);
+    public void fillStatic(MonaModule globalMod) {
+        for (int i=0; i<staticArea.size(); i++) {
+            staticArea.set(i, globalMod.getMember(staticArea.getName(i)));
         }
     }
 
-    public MonaObject[] getMainGlobals() {
-        return mainGlobals;
+    public StaticArea getStaticArea() {
+        return staticArea;
     }
+
+//    public MonaObject[] getMainGlobals() {
+//        return mainGlobals;
+//    }
+//
+//    public String[] getStaticNames() { return staticNames; }
 
 }

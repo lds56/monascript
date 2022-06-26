@@ -4,9 +4,13 @@ import org.lds56.mona.core.exception.InvalidArgumentException;
 import org.lds56.mona.core.runtime.traits.MonaAccessible;
 import org.lds56.mona.core.runtime.traits.MonaInvocable;
 import org.lds56.mona.core.runtime.traits.MonaTrait;
-import org.lds56.mona.core.runtime.types.*;
+import org.lds56.mona.core.runtime.types.MonaNType;
+import org.lds56.mona.core.runtime.types.MonaObject;
+import org.lds56.mona.core.runtime.types.MonaType;
+import org.lds56.mona.core.runtime.types.MonaUndefined;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -28,6 +32,24 @@ public class MonaModule extends MonaObject implements MonaAccessible {
 
     public MonaObject getMember(String name) {
         return members.getOrDefault(name, MonaUndefined.UNDEF);
+    }
+
+    public MonaObject getMemberByPath(List<String> path, String name) {
+        MonaModule module = this;
+        for (String p : path) {
+            MonaObject member = module.getMember(p);
+            if (member instanceof MonaModule) {
+                module = (MonaModule) member;
+            }
+            else {
+                return MonaUndefined.UNDEF;
+            }
+        }
+        return module.getMember(name);
+    }
+
+    public Map<String, MonaObject> getMemberMap() {
+        return members;
     }
 
     @Override

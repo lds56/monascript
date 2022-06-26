@@ -30,8 +30,8 @@ complex_stat
     | WHILE expr block                    # whileStat
     | FOR ids IN expr block               # forStat
     | IF expr block (ELSE block)?         # ifStat
-    | TRY block CATCH (identity | LPAREN identity RPAREN)? block (FINALLY block)?            # tryStat
-    | THROW expr SEMI_COLON               # throwStat
+    // | TRY block CATCH (identity | LPAREN identity RPAREN)? block (FINALLY block)?            # tryStat
+    // | THROW expr SEMI_COLON               # throwStat
     ;
 
 declaration
@@ -125,7 +125,7 @@ mapEntry
 //    ;
 
 identity
-    : ID
+    : ID                    # identifier
     ;
 
 ids

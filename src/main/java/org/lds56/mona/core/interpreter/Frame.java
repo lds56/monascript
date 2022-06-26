@@ -40,6 +40,10 @@ public class Frame {
         this.freeFrame = null;
     }
 
+//    public static Frame createWithInputs(StaticArea ) {
+//
+//    }
+
     public static Frame createWithGlobals(String[] globalNames, MonaObject[] globalConsts, Map<String, Object> inputs) {
         MonaObject[] globals = new MonaObject[globalNames.length];
         for (int i=0; i<globals.length; i++) {

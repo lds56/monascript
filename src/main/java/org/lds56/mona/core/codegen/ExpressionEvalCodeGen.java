@@ -90,7 +90,7 @@ public class ExpressionEvalCodeGen implements AbastractCodeGen<MonaObject> {
     }
 
     @Override
-    public MonaObject onIdentity(String id) {
+    public MonaObject onIdentifier(String id) {
         return env.get(id);
     }
 
@@ -338,6 +338,11 @@ public class ExpressionEvalCodeGen implements AbastractCodeGen<MonaObject> {
     @Override
     public MonaObject onForIn(MonaObject iterName, MonaObject list, MonaObject loopBody) {
         throw new SyntaxNotSupportedException("`For-in` is not supported in expression evaluation");
+    }
+
+    @Override
+    public MonaObject onImport(List<String> moduleNames) {
+        throw new SyntaxNotSupportedException("`Import` is not supported in expression evaluation");
     }
 
 }

@@ -1,12 +1,9 @@
 package org.lds56.mona.core.interpreter;
 
-
 import org.lds56.mona.core.runtime.types.MonaNull;
 import org.lds56.mona.core.runtime.types.MonaObject;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 
 /**
  * @author lds56

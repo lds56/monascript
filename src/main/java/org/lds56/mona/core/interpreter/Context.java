@@ -3,6 +3,7 @@ package org.lds56.mona.core.interpreter;
 import org.lds56.mona.core.runtime.types.MonaObject;
 import org.lds56.mona.core.runtime.types.MonaUndefined;
 
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -13,6 +14,8 @@ import java.util.Objects;
  */
 public class Context {
 
+    private StaticArea _static;
+
     private Frame _frame;
 
     private BasicBlock _block;
@@ -20,13 +23,18 @@ public class Context {
     public int _pc;        // program counter
 
     public Context() {
-        this(0, null, null);
+        this(0, null, null, null);
     }
 
-    public Context(int pc, Frame frame, BasicBlock block) {
+    public Context(StaticArea staticArea) {
+        this(0, null, null, staticArea);
+    }
+
+    public Context(int pc, Frame frame, BasicBlock block, StaticArea staticArea) {
         this._pc = pc;
         this._frame = frame;
         this._block = block;
+        this._static = staticArea;
     }
 
     public void update(int pc, Frame frame, BasicBlock block) {
@@ -43,6 +51,17 @@ public class Context {
 
     public BasicBlock block() {
         return _block;
+    }
+
+    public void fillInputs(Map<String, Object> inputs) {
+        for (int i=0; i<_static.size(); i++) {
+            if (_static.getName(i).startsWith("$")) {
+                String inputName = _static.getName(i).substring(1);
+                if (inputs.containsKey(inputName)){
+                    _static.set(i, MonaObject.wrap(inputs.get(inputName)));
+                }
+            }
+        }
     }
 
     public MonaObject findGlobal(int globalIndex) {
@@ -82,6 +101,14 @@ public class Context {
                 return;
             }
         }
+    }
+
+    public MonaObject findStatic(int idx) {
+        return _static.get(idx);
+    }
+
+    public void setStatic(int idx, MonaObject value) {
+        _static.set(idx, value);
     }
 
     public MonaObject[] popArgs(int argNum) {

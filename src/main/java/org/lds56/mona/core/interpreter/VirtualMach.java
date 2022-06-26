@@ -46,7 +46,7 @@ public class VirtualMach {
         this.frameStack = new ArrayStack<>();
         this.blockStack = new ArrayStack<>();
         this.backStack = new ArrayStack<>();
-        this.ctx = new Context();
+        this.ctx = new Context(byteCode.getStaticArea().duplicate());
     }
 
     public boolean reset() {
@@ -60,9 +60,9 @@ public class VirtualMach {
         return true;
     }
 
-    public void enterMain(Map<String, Object> inputs) {
+    public void enterMain() {
         enterBlockAt(Constants.MAIN_BASIC_BLOCK_INDEX);
-        pushFrame(Frame.createWithGlobals(nowBlock().getGlobalNames(), byteCode.getMainGlobals(), inputs));                // Global frame
+        pushFrame(new Frame(new String[]{}, new MonaObject[]{}));                // Global frame
         pushFrame(Frame.createWithLocals(nowBlock().getLocalNames()).withOuter(topFrame()));    // Main frame
         moveToCalleeStart();
     }
@@ -122,13 +122,22 @@ public class VirtualMach {
         ctx.update(pc, frameStack.peek(), blockStack.peek());
     }
 
+    public void run(Object[] args) {
+
+        if (byteCode == null) {
+            throw new InterpretErrorException("Bytecode not loaded");
+        }
+
+    }
+
     public MonaObject run(Map<String, Object> inputs) {
 
         if (byteCode == null) {
             throw new InterpretErrorException("Bytecode not loaded");
         }
 
-        enterMain(inputs);
+        ctx.fillInputs(inputs);
+        enterMain();
 
         // TODO: Dead loop check
         while (pc < Constants.MAIN_BASIC_BLOCK_EXIT_LINE) {
