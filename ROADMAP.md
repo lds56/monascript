@@ -14,7 +14,7 @@
 ·  - [ ] Safe ? Mark
   - [ ] Match Expression
 - [ ] Optimization
-  - [ ] Compilation (MonaScript -> MonaIR)
+  - [x] Compilation (MonaScript -> MonaIR)
   - [ ] Runtime\
 - [ ] Serialization/Deserialization
 - [ ] Implemented by other PL
